@@ -239,6 +239,51 @@ Parameters:
 - `warmUpTimeInSeconds`: Preparation time before exam starts
 - `difficulty`: Difficulty level (easy, medium, hard)
 
+## Multiple-Choice (MCQ) Labs
+
+Labs can also be pure multiple-choice mock exams (like `kcna-001`) that need no cluster, no setup scripts, and no verification scripts. Questions are graded in the facilitator from the answers submitted with the evaluate call.
+
+### config.json
+
+```json
+{
+  "lab": "kcna-001",
+  "skipClusterSetup": true,
+  "answers": "assets/exams/kcna/001/answers.md",
+  "questions": "assessment.json",
+  "totalMarks": 60,
+  "lowScore": 45,
+  "mediumScore": 52,
+  "highScore": 57
+}
+```
+
+- `skipClusterSetup: true` marks the exam READY immediately - no k3d cluster is created and `warmUpTimeInSeconds` should be small (e.g. `10`).
+
+### assessment.json question format
+
+```json
+{
+  "id": "1",
+  "type": "mcq",
+  "domain": "Kubernetes Fundamentals",
+  "question": "Which component exposes the Kubernetes API?",
+  "options": ["kube-scheduler", "kube-apiserver", "etcd", "kubelet"],
+  "answer": "B",
+  "explanation": "The kube-apiserver is the control plane entry point.",
+  "concepts": ["control-plane", "kube-apiserver"]
+}
+```
+
+- `answer` is the **letter** of the correct option (A-D).
+- `domain` powers the domain-wise performance breakdown on the results page - group questions by exam blueprint area.
+- `answer` and `explanation` are **stripped server-side** before questions reach the browser (students can't read them from the API), and explanations are revealed on the results page after grading.
+- Each question is worth 1 point; `totalPossibleScore` equals the question count.
+
+### How grading works
+
+The webapp submits the selected options with the evaluate call (`{ answers: { "1": "B", ... } }`). The facilitator grades them locally (no SSH, no jumphost) and merges them into the standard result shape, so the results page shows per-question correctness, explanations, and the domain breakdown. Answers are persisted in Redis so the results page's *Re-evaluate* button keeps working. Results show pass/fail against a 75% pass mark.
+
 ## Best Practices
 
 1. **Realistic Scenarios**: Design questions that mimic real certification exam tasks

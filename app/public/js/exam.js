@@ -491,7 +491,7 @@ document.addEventListener('DOMContentLoaded', function() {
         trackExamEndEvent()
             .then(() => {
                 // Make API call to end and evaluate the exam
-                return ExamApi.evaluateExam(examId);
+                return ExamApi.evaluateExam(examId, collectMcqAnswers());
             })
             .then(data => {
                 console.log('Exam evaluation started:', data);
@@ -506,6 +506,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Error ending exam:', error);
                 alert('There was an error evaluating your exam. Please try manually ending the exam.');
             });
+    }
+    
+    // Collect selected multiple-choice answers from all questions
+    // Returns { "<questionId>": "<option letter>" } for MCQ questions only
+    function collectMcqAnswers() {
+        const answers = {};
+        questions.forEach(q => {
+            if (q.originalData && q.originalData.type === 'mcq' && q.selectedAnswer) {
+                answers[q.id] = q.selectedAnswer;
+            }
+        });
+        return answers;
     }
     
     // Update question content
@@ -538,7 +550,23 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (actionButtonsContainer) {
                             actionButtonsContainer.style.display = 'none';
                         }
+                        // Review mode: show selections but don't allow changes
+                        questionContent.querySelectorAll('.mcq-radio').forEach(input => {
+                            input.disabled = true;
+                        });
                     } else {
+                    // Wire up multiple-choice option selection
+                    questionContent.querySelectorAll('.mcq-radio').forEach(input => {
+                        input.addEventListener('change', function() {
+                            question.selectedAnswer = this.value;
+                            // Update selected styling on all options for this question
+                            questionContent.querySelectorAll('.mcq-option').forEach(opt => {
+                                opt.classList.toggle('mcq-option-selected',
+                                    opt.querySelector('.mcq-radio').checked);
+                            });
+                        });
+                    });
+                    
                     // Add functionality to flag button
                     const flagQuestionBtn = document.getElementById('flagQuestionBtn');
                     if (flagQuestionBtn) {
@@ -798,7 +826,7 @@ document.addEventListener('DOMContentLoaded', function() {
         trackExamEndEvent()
             .then(() => {
         // Make API call to end and evaluate the exam
-                return ExamApi.evaluateExam(examId);
+                return ExamApi.evaluateExam(examId, collectMcqAnswers());
         })
         .then(data => {
             console.log('Exam evaluation started:', data);

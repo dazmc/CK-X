@@ -190,7 +190,7 @@ async function cleanupExamEnvironment(examId) {
  * @param {Array} questions - Array of questions with verification steps
  * @returns {Promise<Object>} Result object with evaluation data
  */
-async function evaluateExamOnJumphost(examId, questions) {
+async function evaluateExamOnJumphost(examId, questions, mcqAnswers = {}) {
   try {
     let totalScore = 0;
     let totalPossibleScore = 0;
@@ -198,6 +198,7 @@ async function evaluateExamOnJumphost(examId, questions) {
 
     //log number of questions 
     logger.info(`Number of questions to evaluate: ${questions.length}`);
+    logger.info(`MCQ answers submitted: ${Object.keys(mcqAnswers).length}`);
     
     // Process each question
     for (const question of questions) {
@@ -209,6 +210,35 @@ async function evaluateExamOnJumphost(examId, questions) {
         concepts: question.concepts || [],
         verificationResults: []
       };
+
+      // Multiple-choice questions are graded locally from the submitted
+      // answers - no SSH/jumphost involvement needed
+      if (question.type === 'mcq') {
+        const selected = mcqAnswers[question.id] || null;
+        const isCorrect = selected !== null && selected === question.answer;
+        const weightage = 1;
+        const score = isCorrect ? weightage : 0;
+        totalPossibleScore += weightage;
+        totalScore += score;
+
+        questionResult.type = 'mcq';
+        questionResult.domain = question.domain || null;
+        questionResult.verificationResults.push({
+          id: '1',
+          description: isCorrect ? 'Answered correctly' :
+            (selected ? `Incorrect - you answered ${selected}` : 'Not answered'),
+          validAnswer: isCorrect,
+          weightage: weightage,
+          score: score,
+          yourAnswer: selected,
+          correctAnswer: question.answer,
+          explanation: question.explanation || ''
+        });
+
+        logger.info(`Question ${question.id} (mcq): ${isCorrect ? 'CORRECT' : 'INCORRECT'} (selected: ${selected}, correct: ${question.answer})`);
+        evaluationResults.push(questionResult);
+        continue;
+      }
 
       // log info about question 
       logger.info(`Question ID: ${question.id}`);
@@ -299,6 +329,26 @@ async function evaluateExamOnJumphost(examId, questions) {
       rank = 'medium';
     }
 
+    // Build a domain-wise performance breakdown (MCQ exams assign a domain per question)
+    let domainBreakdown = null;
+    const domains = [...new Set(evaluationResults.map(q => q.domain).filter(Boolean))];
+    if (domains.length > 0) {
+      domainBreakdown = domains.map(domain => {
+        const domainQuestions = evaluationResults.filter(q => q.domain === domain);
+        const score = domainQuestions.reduce((total, q) =>
+          total + q.verificationResults.reduce((s, v) => s + v.score, 0), 0);
+        const possibleScore = domainQuestions.reduce((total, q) =>
+          total + q.verificationResults.reduce((s, v) => s + v.weightage, 0), 0);
+        return {
+          domain,
+          questionCount: domainQuestions.length,
+          score,
+          possibleScore,
+          percentage: possibleScore > 0 ? Math.round((score / possibleScore) * 100) : 0
+        };
+      });
+    }
+
     // Prepare final evaluation result
     const finalResult = {
       examId,
@@ -308,6 +358,7 @@ async function evaluateExamOnJumphost(examId, questions) {
       percentageScore,
       rank,
       evaluationResults,
+      domainBreakdown,
       completedAt: new Date().toISOString()
     };
 

@@ -71,6 +71,66 @@ function generateQuestionContent(question) {
         // Format question content with improved styling
         const formattedQuestionContent = processQuestionContent(question.content);
         
+        // Multiple-choice questions: render option selectors instead of the
+        // instance/namespace hints used by hands-on lab questions
+        if (originalData.type === 'mcq') {
+            const domain = originalData.domain || '';
+            const options = originalData.options || [];
+            const optionLetters = ['A', 'B', 'C', 'D', 'E', 'F'];
+            const selectedAnswer = question.selectedAnswer || null;
+            
+            const optionsHtml = options.map((option, index) => {
+                const letter = optionLetters[index] || String(index + 1);
+                const isChecked = selectedAnswer === letter ? 'checked' : '';
+                return `
+                    <label class="mcq-option ${isChecked ? 'mcq-option-selected' : ''}" for="mcq-${question.id}-${letter}">
+                        <input type="radio" name="mcq-${question.id}" id="mcq-${question.id}-${letter}"
+                               class="mcq-radio" data-letter="${letter}" value="${letter}" ${isChecked}>
+                        <span class="mcq-letter">${letter}</span>
+                        <span class="mcq-text">${option}</span>
+                    </label>
+                `;
+            }).join('');
+            
+            return `
+                <div class="d-flex flex-column" style="height: 100%;">
+                    <div class="question-header">
+                        ${domain ? `<div class="mb-3"><strong>Domain:</strong> <span class="text-primary">${domain}</span></div>` : ''}
+                        
+                        <div class="mb-3">
+                            <strong>Concepts:</strong> <span class="text-primary">${conceptsString}</span>
+                        </div>
+                        
+                        <hr class="my-3">
+                    </div>
+                    
+                    <div class="question-body">
+                        ${formattedQuestionContent}
+                        <div class="mcq-options mt-3">
+                            ${optionsHtml}
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons-container mt-auto">
+                        <div class="d-flex justify-content-between py-2">
+                            <button class="btn ${question.flagged ? 'btn-warning' : 'btn-outline-warning'}" id="flagQuestionBtn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-flag${question.flagged ? '-fill' : ''} me-2" viewBox="0 0 16 16">
+                                    <path d="M14.778.085A.5.5 0 0 1 15 .5V8a.5.5 0 0 1-.314.464L14.5 8l.186.464-.003.001-.006.003-.023.009a12.435 12.435 0 0 1-.397.15c-.264.095-.631.223-1.047.35-.816.252-1.879.523-2.71.523-.847 0-1.548-.28-2.158-.525l-.028-.01C7.68 8.71 7.14 8.5 6.5 8.5c-.7 0-1.638.23-2.437.477A19.626 19.626 0 0 0 3 9.342V15.5a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 1 0v.282c.226-.079.496-.17.79-.26C4.606.272 5.67 0 6.5 0c.84 0 1.524.277 2.121.519l.043.018C9.286.788 9.828 1 10.5 1c.7 0 1.638-.23 2.437-.477a19.587 19.587 0 0 0 1.349-.476l.019-.007.004-.002h.001"/>
+                                </svg>
+                                ${question.flagged ? 'Flagged' : 'Flag for review'}
+                            </button>
+                            <button class="btn btn-success" id="nextQuestionBtn">
+                                Satisfied with answer
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right ms-2" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
         // Create formatted content with minimal layout
         return `
             <div class="d-flex flex-column" style="height: 100%;">

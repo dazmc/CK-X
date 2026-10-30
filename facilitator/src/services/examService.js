@@ -52,12 +52,19 @@ async function createExam(examData) {
     
     logger.info(`Exam created successfully with ID: ${examId}`);
     
-    // Determine number of nodes required for the exam (default to 1 if not specified)
-    const nodeCount = examData.config.workerNodes || 1;
-    
-    // Set up the exam environment asynchronously
-    // This will happen in the background while the response is sent back to the client
-    setupExamEnvironmentAsync(examId, nodeCount);
+    // Multiple-choice exams don't need a Kubernetes cluster: skip environment
+    // preparation and mark the exam READY immediately (no warm-up wait)
+    if (examData.config.skipClusterSetup) {
+      await redisClient.persistExamStatus(examId, 'READY');
+      logger.info(`Exam ${examId} marked READY (skipClusterSetup - no cluster needed)`);
+    } else {
+      // Determine number of nodes required for the exam (default to 1 if not specified)
+      const nodeCount = examData.config.workerNodes || 1;
+      
+      // Set up the exam environment asynchronously
+      // This will happen in the background while the response is sent back to the client
+      setupExamEnvironmentAsync(examId, nodeCount);
+    }
     
     // send metrics to metric server
     MetricService.sendMetrics(examId, {
@@ -208,6 +215,21 @@ async function getExamAssets(examId) {
 }
 
 /**
+ * Read the raw assessment questions (including answers) for an asset path
+ * Used internally for grading - never expose the result directly to clients
+ * @param {string} assetPath - Path to the exam asset directory
+ * @returns {Array} Array of question objects
+ */
+function readRawQuestions(assetPath) {
+  const configPath = path.join(process.cwd(), assetPath, 'config.json');
+  const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+  const questionsFilePath = config.questions || 'assessment.json';
+  const fullQuestionsPath = path.join(process.cwd(), assetPath, questionsFilePath);
+  const questionsData = fs.readFileSync(fullQuestionsPath, 'utf8');
+  return JSON.parse(questionsData).questions || [];
+}
+
+/**
  * Get exam questions
  * @param {string} examId - The exam ID
  * @returns {Promise<Object>} Result object with success status and data
@@ -267,16 +289,25 @@ async function getExamQuestions(examId) {
       };
     }
     
-    // Read and parse questions.json
-    const questionsData = fs.readFileSync(fullQuestionsPath, 'utf8');
-    const questions = JSON.parse(questionsData);
+    // Read the raw questions (including answers - needed for grading)
+    const questions = readRawQuestions(assetPath);
+    
+    // Strip answer-related fields before sending to the browser:
+    // multiple-choice labs store `answer` and `explanation` in assessment.json,
+    // and students must not be able to read them from the API response
+    const sanitizedQuestions = questions.map(q => {
+      const safe = { ...q };
+      delete safe.answer;
+      delete safe.explanation;
+      return safe;
+    });
     
     logger.info(`Successfully retrieved questions for exam ${examId}`);
     
     return {
       success: true,
       data: {
-        questions: questions.questions || []
+        questions: sanitizedQuestions
       }
     };
   } catch (error) {
@@ -312,24 +343,33 @@ async function evaluateExam(examId, evaluationData) {
       throw new Error(`Exam not found with ID: ${examId}`);
     }
     
-    // Get exam questions data
-    const questionsResponse = await getExamQuestions(examId);
-    if (!questionsResponse.success) {
-      throw new Error('Failed to get exam questions');
-    }
-    
     // Get assessment path information
     const assetPath = examInfo.assetPath;
     if (!assetPath) {
       throw new Error('Asset path not defined in exam info');
     }
     
+    // Get raw questions (including answers) for grading
+    const questions = readRawQuestions(assetPath);
+    
+    // Resolve multiple-choice answers: prefer answers submitted with this
+    // evaluation request, otherwise fall back to previously persisted answers
+    // (the results page's "Re-evaluate" button posts an empty body)
+    let mcqAnswers = (evaluationData && evaluationData.answers) || null;
+    if (!mcqAnswers) {
+      mcqAnswers = await redisClient.getMcqAnswers(examId);
+    }
+    mcqAnswers = mcqAnswers || {};
+    
+    // Persist answers so re-evaluation keeps working after this request
+    await redisClient.persistMcqAnswers(examId, mcqAnswers);
+    
     // Start evaluation asynchronously using Promise
     // This will happen in the background while the response is sent back to the client
     Promise.resolve().then(async () => {
       try {
         // Call the jumphost service to perform the evaluation
-        await jumphostService.evaluateExamOnJumphost(examId, questionsResponse.data.questions);
+        await jumphostService.evaluateExamOnJumphost(examId, questions, mcqAnswers);
       } catch (error) {
         logger.error(`Error in async exam evaluation for exam ${examId}`, { error: error.message });
         // Update exam status to EVALUATION_FAILED

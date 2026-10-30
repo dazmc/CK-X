@@ -12,6 +12,7 @@ const KEYS = {
   EXAM_STATUS: 'exam:status:', // For storing exam status string
   CURRENT_EXAM_ID: 'current-exam-id', // For storing current exam ID (single key)
   EXAM_RESULT: 'exam:result:', // For storing exam evaluation results
+  EXAM_MCQ_ANSWERS: 'exam:mcq-answers:', // For storing multiple-choice answers (so re-evaluation works)
 };
 
 // Create Redis client using environment variables
@@ -107,6 +108,44 @@ async function persistExamResult(examId, result, ttl = 3600000) {
     return resultSet;
   } catch (error) {
     logger.error(`Failed to persist exam result: ${error.message}`);
+    throw error;
+  }
+}
+
+/**
+ * Persist multiple-choice answers for an exam
+ * Stored so that re-evaluation (which posts no body) can still grade MCQ questions
+ * @param {string} examId - Exam identifier
+ * @param {Object} answers - Map of question ID to selected option (e.g. { "1": "B" })
+ * @param {number} [ttl=3600000] - Time to live in seconds
+ * @returns {Promise<string>} - Returns 'OK' if successful
+ */
+async function persistMcqAnswers(examId, answers, ttl = 3600000) {
+  try {
+    const client = await getClient();
+    const key = `${KEYS.EXAM_MCQ_ANSWERS}${examId}`;
+    const resultSet = await client.setEx(key, ttl, JSON.stringify(answers || {}));
+    logger.debug(`Persisted MCQ answers for exam ${examId}`);
+    return resultSet;
+  } catch (error) {
+    logger.error(`Failed to persist MCQ answers: ${error.message}`);
+    throw error;
+  }
+}
+
+/**
+ * Get persisted multiple-choice answers for an exam
+ * @param {string} examId - Exam identifier
+ * @returns {Promise<Object|null>} - Map of question ID to selected option, or null if none stored
+ */
+async function getMcqAnswers(examId) {
+  try {
+    const client = await getClient();
+    const key = `${KEYS.EXAM_MCQ_ANSWERS}${examId}`;
+    const data = await client.get(key);
+    return data ? JSON.parse(data) : null;
+  } catch (error) {
+    logger.error(`Failed to get MCQ answers: ${error.message}`);
     throw error;
   }
 }
@@ -328,6 +367,8 @@ module.exports = {
   persistExamInfo,
   persistExamStatus,
   persistExamResult,
+  persistMcqAnswers,
+  getMcqAnswers,
   setCurrentExamId,
   
   // Read operations

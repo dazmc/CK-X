@@ -68,12 +68,15 @@ function fetchCurrentExamInfo() {
 }
 
 // Function to evaluate exam
-function evaluateExam(examId) {
+// answers is optional: multiple-choice exams submit their selected options
+// (e.g. { "1": "B", "2": "D" }); hands-on labs post an empty body
+function evaluateExam(examId, answers = {}) {
     return fetch(`/facilitator/api/v1/exams/${examId}/evaluate`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
-        }
+        },
+        body: JSON.stringify({ answers })
     })
     .then(response => {
         if (!response.ok) {

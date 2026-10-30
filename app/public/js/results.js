@@ -382,6 +382,38 @@ document.addEventListener('DOMContentLoaded', function() {
         // Clear questions container
         questionsContainer.innerHTML = '';
         
+        // Domain-wise breakdown for multiple-choice exams (KCNA/KCSA style)
+        if (results.domainBreakdown && results.domainBreakdown.length > 0) {
+            const passed = results.percentageScore >= 75;
+            const domainCard = document.createElement('div');
+            domainCard.className = 'question-card domain-breakdown-card mb-4';
+            domainCard.innerHTML = `
+                <div class="question-header">
+                    <h3 class="question-title">Domain Performance</h3>
+                    <div class="question-score">
+                        Pass mark 75%:
+                        <span class="${passed ? 'status-success' : 'status-failure'}">
+                            ${passed ? '<i class="fas fa-check-circle"></i> Passed' : '<i class="fas fa-times-circle"></i> Not passed'}
+                        </span>
+                    </div>
+                </div>
+                <ul class="verification-items">
+                    ${results.domainBreakdown.map(d => `
+                        <li class="verification-item">
+                            <div class="verification-main">
+                                <div class="verification-description">
+                                    <strong>${d.domain}</strong>
+                                    <div class="text-muted">${d.questionCount} question${d.questionCount !== 1 ? 's' : ''} - ${d.score} of ${d.possibleScore}</div>
+                                </div>
+                            </div>
+                            <div class="verification-status ${d.percentage >= 75 ? 'status-success' : 'status-failure'}">${d.percentage}%</div>
+                        </li>
+                    `).join('')}
+                </ul>
+            `;
+            questionsContainer.appendChild(domainCard);
+        }
+        
         // Add questions and verifications
         if (results.evaluationResults && results.evaluationResults.length > 0) {
             // Sort questions by ID (convert to number for proper numeric sorting)
@@ -424,8 +456,24 @@ document.addEventListener('DOMContentLoaded', function() {
                     const item = document.createElement('li');
                     item.className = 'verification-item';
                     
+                    // Multiple-choice extras: your answer, correct answer, explanation
+                    let mcqDetails = '';
+                    if (verification.correctAnswer) {
+                        const yourAnswer = verification.yourAnswer || 'Not answered';
+                        mcqDetails = `
+                            <div class="mcq-answer-details mt-2">
+                                <div><strong>Your answer:</strong> ${yourAnswer}</div>
+                                <div><strong>Correct answer:</strong> ${verification.correctAnswer}</div>
+                                ${verification.explanation ? `<div class="mcq-explanation mt-1 text-muted">${verification.explanation}</div>` : ''}
+                            </div>
+                        `;
+                    }
+                    
                     item.innerHTML = `
-                        <div class="verification-description">${verification.description}</div>
+                        <div class="verification-main">
+                            <div class="verification-description">${verification.description}</div>
+                            ${mcqDetails}
+                        </div>
                         <div class="verification-status ${verification.validAnswer ? 'status-success' : 'status-failure'}">
                             ${verification.validAnswer ? 
                                 '<i class="fas fa-check-circle"></i>' : 

@@ -42,7 +42,28 @@ const validateCreateExam = (req, res, next) => {
  * Validate the evaluate exam request
  */
 const validateEvaluateExam = (req, res, next) => {
-  // TODO: Implement this
+  // Optional body: multiple-choice exams submit their selected answers
+  // (e.g. { answers: { "1": "B", "2": "D" } }); script labs post an empty body
+  const { answers } = req.body || {};
+  
+  if (answers !== undefined) {
+    if (typeof answers !== 'object' || answers === null || Array.isArray(answers)) {
+      return res.status(400).json({
+        error: 'Bad Request',
+        message: 'Request body answers field must be an object mapping question IDs to selected options'
+      });
+    }
+    
+    for (const [questionId, option] of Object.entries(answers)) {
+      if (typeof option !== 'string') {
+        return res.status(400).json({
+          error: 'Bad Request',
+          message: `Answer for question ${questionId} must be a string`
+        });
+      }
+    }
+  }
+  
   next();
 };
 

@@ -183,6 +183,31 @@
     margin-right: 20px;
 }
 
+/* Flex wrapper so multiple-choice details stack under the description */
+.verification-main {
+    flex-grow: 1;
+    margin-right: 20px;
+}
+
+.verification-main .verification-description {
+    margin-right: 0;
+}
+
+/* Multiple-choice answer details and explanation on the results page */
+.mcq-answer-details {
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.mcq-explanation {
+    font-size: 0.85rem;
+    padding: 8px 12px;
+    background-color: #f8f9fa;
+    border-left: 3px solid #0d6efd;
+    border-radius: 4px;
+    margin-top: 6px;
+}
+
 .verification-status {
     font-size: 24px;
     color: #27ae60;
