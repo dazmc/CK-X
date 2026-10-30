@@ -1,0 +1,491 @@
+{
+  "questions": [
+    {
+      "id": "1",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "List all the **worker** nodes in the cluster and write their names to the file `/tmp/exam/nodes.txt` (one node name per line).\n\nThe control-plane (server) node must **not** be included in the file.",
+      "concepts": ["kubectl", "nodes", "cluster-basics"],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Output file /tmp/exam/nodes.txt exists and is not empty",
+          "verificationScriptFile": "q1_s1_validate_nodes_file.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "2",
+          "description": "All worker nodes are listed in the file",
+          "verificationScriptFile": "q1_s2_validate_worker_nodes_listed.sh",
+          "expectedOutput": "0",
+          "weightage": 1
+        },
+        {
+          "id": "3",
+          "description": "Control-plane node is excluded from the file",
+          "verificationScriptFile": "q1_s3_validate_server_excluded.sh",
+          "expectedOutput": "0",
+          "weightage": 1
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "namespace": "pod-basics",
+      "machineHostname": "ckad9999",
+      "question": "In the namespace `pod-basics`, create `3` pods named `web-1`, `web-2` and `web-3` using the `busybox:1.36` image.\n\nEach pod must run the command `sleep 3600` and carry the label `app=web`.\n\nOnce all 3 pods are running, write the names of the running pods (one per line) to the file `/tmp/exam/running-pods.txt`.",
+      "concepts": ["pods", "labels", "kubectl"],
+      "verification": [
+        {
+          "id": "1",
+          "description": "3 pods with label app=web exist",
+          "verificationScriptFile": "q2_s1_validate_pods_exist.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "2",
+          "description": "All pods are in Running state",
+          "verificationScriptFile": "q2_s2_validate_pods_running.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "3",
+          "description": "Running pod names are listed in /tmp/exam/running-pods.txt",
+          "verificationScriptFile": "q2_s3_validate_pods_file.sh",
+          "expectedOutput": "0",
+          "weightage": 1
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "namespace": "node-select",
+      "machineHostname": "ckad9999",
+      "question": "Label the node `k3d-cluster-agent-1` with `disk=ssd`.\n\nThen, in the namespace `node-select`, create a pod named `nginx-pod` using the `nginx:1.27` image that is scheduled **only** on that node using a `nodeSelector`.",
+      "concepts": ["scheduling", "node-labels", "node-selector", "pods"],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Node k3d-cluster-agent-1 is labeled disk=ssd",
+          "verificationScriptFile": "q3_s1_validate_node_label.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "2",
+          "description": "Pod nginx-pod exists with nodeSelector disk=ssd",
+          "verificationScriptFile": "q3_s2_validate_pod_exists.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "3",
+          "description": "Pod is Running on k3d-cluster-agent-1",
+          "verificationScriptFile": "q3_s3_validate_pod_placement.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "namespace": "nodeport-lab",
+      "machineHostname": "ckad9999",
+      "question": "In the namespace `nodeport-lab`:\n\n1. Create a deployment named `web-app` with `2` replicas using the `nginx:1.27` image. The pods must carry the label `app=web-app`.\n2. Expose it through a service named `web-svc` of type `NodePort` that listens on port `80` and maps to NodePort `30088`.",
+      "concepts": ["deployments", "services", "nodeport"],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Deployment web-app exists with 2 ready replicas",
+          "verificationScriptFile": "q4_s1_validate_deployment.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "2",
+          "description": "Service web-svc is NodePort exposing port 80",
+          "verificationScriptFile": "q4_s2_validate_service_type.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "3",
+          "description": "Service uses NodePort 30088",
+          "verificationScriptFile": "q4_s3_validate_nodeport_number.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "namespace": "image-fix",
+      "machineHostname": "ckad9999",
+      "question": "The deployment `web-recovery` in namespace `image-fix` was deployed with an incorrect image tag (`nginx:1.25.12-typo`) and its pods are stuck in `ImagePullBackOff`.\n\nFix the deployment so that all its pods are running and ready. Do **not** delete and recreate the deployment - repair it in place.",
+      "concepts": ["troubleshooting", "image-pull", "deployments"],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Deployment no longer uses the broken image",
+          "verificationScriptFile": "q5_s1_validate_image_fixed.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "2",
+          "description": "Deployment has 2 ready replicas",
+          "verificationScriptFile": "q5_s2_validate_replicas_ready.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "3",
+          "description": "All pods are Running with no pull errors",
+          "verificationScriptFile": "q5_s3_validate_pods_running.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        }
+      ]
+    },
+    {
+      "id": "6",
+      "namespace": "batch-jobs",
+      "machineHostname": "ckad9999",
+      "question": "In the namespace `batch-jobs`, create a job named `batch-worker` using the `busybox:1.36` image.\n\nThe job must run the command `echo processing && sleep 5` and meet these requirements:\n\n1. Run `4` pods to completion (`completions`)\n2. Allow `2` pods to run in parallel (`parallelism`)\n3. Use a `backoffLimit` of `6`\n4. Set `restartPolicy` to `Never`\n5. Clean itself up `120` seconds after finishing (`ttlSecondsAfterFinished`)",
+      "concepts": ["jobs", "batch", "ttl"],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Job batch-worker exists",
+          "verificationScriptFile": "q6_s1_validate_job_exists.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "2",
+          "description": "Job completions/parallelism/backoffLimit/restartPolicy/TTL are correct",
+          "verificationScriptFile": "q6_s2_validate_job_config.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "3",
+          "description": "Job completed successfully with 4 pods",
+          "verificationScriptFile": "q6_s3_validate_job_completed.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        }
+      ]
+    },
+    {
+      "id": "7",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "A certificate signing request named `app-web-csr` is waiting for manual approval in the cluster.\n\nApprove the CSR so that it shows an `Approved` condition. Do not deny it and do not delete and recreate it.",
+      "concepts": ["certificates", "csr", "cluster-maintenance"],
+      "verification": [
+        {
+          "id": "1",
+          "description": "CSR app-web-csr exists",
+          "verificationScriptFile": "q7_s1_validate_csr_exists.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "CSR is Approved",
+          "verificationScriptFile": "q7_s2_validate_csr_approved.sh",
+          "expectedOutput": "0",
+          "weightage": 1
+        },
+        {
+          "id": "3",
+          "description": "CSR was not Denied",
+          "verificationScriptFile": "q7_s3_validate_csr_not_denied.sh",
+          "expectedOutput": "0",
+          "weightage": 1
+        }
+      ]
+    },
+    {
+      "id": "8",
+      "namespace": "storage-expand",
+      "machineHostname": "ckad9999",
+      "question": "The persistent volume claim `data-pvc` in namespace `storage-expand` was created with a request of `2Gi` and needs more space.\n\n1. Ensure the storage class `expandable` has `allowVolumeExpansion` enabled\n2. Expand `data-pvc` to request `5Gi` without recreating it. The claim must stay `Bound`.",
+      "concepts": ["storage", "pvc", "volume-expansion"],
+      "verification": [
+        {
+          "id": "1",
+          "description": "StorageClass expandable allows volume expansion",
+          "verificationScriptFile": "q8_s1_validate_storageclass_expansion.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "2",
+          "description": "PVC requests 5Gi",
+          "verificationScriptFile": "q8_s2_validate_pvc_expanded.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "3",
+          "description": "PVC is still Bound",
+          "verificationScriptFile": "q8_s3_validate_pvc_bound.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        }
+      ]
+    },
+    {
+      "id": "9",
+      "namespace": "svc-endpoints",
+      "machineHostname": "ckad9999",
+      "question": "The service `frontend-svc` in namespace `svc-endpoints` has no endpoints even though the `frontend` deployment is running with 2 ready pods.\n\nFind the misconfiguration and fix the service so that traffic actually reaches the pods. Do not delete and recreate the deployment.",
+      "concepts": ["troubleshooting", "services", "endpoints", "selectors"],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Service selector matches the pod label app=frontend",
+          "verificationScriptFile": "q9_s1_validate_selector.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "2",
+          "description": "Endpoints are populated",
+          "verificationScriptFile": "q9_s2_validate_endpoints.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "3",
+          "description": "Traffic flows through the service",
+          "verificationScriptFile": "q9_s3_validate_traffic.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        }
+      ]
+    },
+    {
+      "id": "10",
+      "namespace": "netpol-debug",
+      "machineHostname": "ckad9999",
+      "question": "In namespace `netpol-debug`, the service `backend` routes to pods that the network policy `backend-access` is supposed to protect: traffic on port `80` must only be allowed from pods labeled `access=granted`.\n\nBecause of a misconfiguration, **no pod can currently reach the backend**. The policy mistakenly selects pods labeled `app=frontend`, which do not exist.\n\nFix the policy so that:\n\n1. Pods labeled `access=granted` (like the `tester` pod) can reach the backend on port `80`\n2. The policy still only protects the `backend` pods on port 80",
+      "concepts": ["network-policies", "troubleshooting", "networking"],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Policy allows from pods labeled access=granted",
+          "verificationScriptFile": "q10_s1_validate_policy_selector.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "Policy still targets backend pods on port 80",
+          "verificationScriptFile": "q10_s2_validate_policy_scope.sh",
+          "expectedOutput": "0",
+          "weightage": 1
+        },
+        {
+          "id": "3",
+          "description": "Tester pod can actually reach the backend",
+          "verificationScriptFile": "q10_s3_validate_connectivity.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        }
+      ]
+    },
+    {
+      "id": "11",
+      "namespace": "debug-pod",
+      "machineHostname": "ckad9999",
+      "question": "The pod `app-crasher` in namespace `debug-pod` is running but never becomes `Ready` - it stays `0/1`.\n\nThe app container keeps waiting for a configuration file that does not exist, and its readiness probe only passes once the file `/app/config/settings.conf` is present.\n\n1. Use `kubectl debug` to attach an **ephemeral container** to `app-crasher` and investigate why the pod is not ready\n2. Using your findings, create the missing file so that the pod reaches `Ready` (the file must exist inside the app container at `/app/config/settings.conf`)",
+      "concepts": ["troubleshooting", "kubectl-debug", "ephemeral-containers", "pods"],
+      "verification": [
+        {
+          "id": "1",
+          "description": "An ephemeral container was added to app-crasher",
+          "verificationScriptFile": "q11_s1_validate_ephemeral_container.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "2",
+          "description": "Pod app-crasher is Ready",
+          "verificationScriptFile": "q11_s2_validate_pod_running.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "3",
+          "description": "/app/config/settings.conf exists in the app container",
+          "verificationScriptFile": "q11_s3_validate_config_file.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        }
+      ]
+    },
+    {
+      "id": "12",
+      "namespace": "api-update",
+      "machineHostname": "ckad9999",
+      "question": "Three manifest files in the directory `/tmp/exam/deprecations/` use **deprecated API versions** that have been removed from the cluster and can no longer be applied:\n\n- `deployment.yaml` (apps/v1beta2)\n- `ingress.yaml` (extensions/v1beta1)\n- `cronjob.yaml` (batch/v1beta1)\n\nUpdate each manifest to its current API version - adding any fields the new version requires (for example `pathType` on the ingress and the nested `jobTemplate.spec.template.spec` structure on the cronjob) - and apply all three resources to the namespace `api-update`.",
+      "concepts": ["api-versions", "deprecations", "deployments", "ingress", "cronjob"],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Deployment uses apps/v1 and is applied",
+          "verificationScriptFile": "q12_s1_validate_deployment_api.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "Ingress uses networking.k8s.io/v1 with valid fields",
+          "verificationScriptFile": "q12_s2_validate_ingress_api.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "3",
+          "description": "CronJob uses batch/v1 with correct schedule",
+          "verificationScriptFile": "q12_s3_validate_cronjob_api.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        }
+      ]
+    },
+    {
+      "id": "13",
+      "namespace": "rbac-debug",
+      "machineHostname": "ckad9999",
+      "question": "In namespace `rbac-debug`, the service account `pod-viewer` is bound to the role `pod-inspector`. It can list pods, but the application using it receives a `403 Forbidden` when it tries to read configmaps (for example `app-settings`).\n\nFind the missing permission and grant it so the service account can `get` configmaps in its namespace.\n\nKeep the fix **scoped**: the service account must not gain access to other namespaces or cluster-wide permissions.",
+      "concepts": ["rbac", "troubleshooting", "service-accounts", "roles"],
+      "verification": [
+        {
+          "id": "1",
+          "description": "ServiceAccount can still list pods",
+          "verificationScriptFile": "q13_s1_validate_can_list_pods.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "2",
+          "description": "ServiceAccount can get configmaps",
+          "verificationScriptFile": "q13_s2_validate_can_get_configmaps.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "3",
+          "description": "Fix is not overly broad",
+          "verificationScriptFile": "q13_s3_validate_no_cluster_wide.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        }
+      ]
+    },
+    {
+      "id": "14",
+      "namespace": "spread",
+      "machineHostname": "ckad9999",
+      "question": "In the namespace `spread`, create a deployment named `spread-app` with `4` replicas using the `nginx:1.27` image. The pods must carry the label `app=spread-app`.\n\nThe replicas must be spread evenly across the worker nodes:\n\n1. Add a `topologySpreadConstraints` entry with `topologyKey` set to `kubernetes.io/hostname`\n2. Set `maxSkew` to `1`\n3. Set `whenUnsatisfiable` to `DoNotSchedule`\n4. Match the constraint to the pod label `app=spread-app`",
+      "concepts": ["scheduling", "topology-spread", "deployments"],
+      "verification": [
+        {
+          "id": "1",
+          "description": "topologySpreadConstraints configured correctly",
+          "verificationScriptFile": "q14_s1_validate_spread_constraints.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "2",
+          "description": "Deployment has 4 ready replicas",
+          "verificationScriptFile": "q14_s2_validate_replicas_ready.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "3",
+          "description": "Pods are evenly distributed across nodes",
+          "verificationScriptFile": "q14_s3_validate_even_distribution.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        }
+      ]
+    },
+    {
+      "id": "15",
+      "namespace": "repair",
+      "machineHostname": "ckad9999",
+      "question": "The application in namespace `repair` is broken in multiple ways. The deployment `shop` shows pods that never become ready, and the service `shop-svc` routes no traffic despite the pods existing.\n\nThere are **three** separate faults to find and fix:\n\n1. The deployment's readiness probe checks a path that does not exist, so the pods never report Ready\n2. The service selector does not match the pods' labels\n3. The service `targetPort` does not match the port the container listens on\n\nRepair all three so that all `3` replicas are ready and traffic flows through `shop-svc`.",
+      "concepts": ["troubleshooting", "probes", "services", "endpoints"],
+      "verification": [
+        {
+          "id": "1",
+          "description": "All 3 shop pods are Ready",
+          "verificationScriptFile": "q15_s1_validate_pods_ready.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "Service selector and targetPort are correct",
+          "verificationScriptFile": "q15_s2_validate_service_selector_port.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "3",
+          "description": "Endpoints populated and traffic flows",
+          "verificationScriptFile": "q15_s3_validate_endpoints_traffic.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        }
+      ]
+    },
+    {
+      "id": "16",
+      "namespace": "maintenance",
+      "machineHostname": "ckad9999",
+      "question": "Node `k3d-cluster-agent-1` was taken offline for maintenance: it was cordoned and tainted with `dedicated=critical:NoSchedule`.\n\nThe deployment `critical-app` in namespace `maintenance` targets this node and its 3 pods are stuck `Pending`, leaving the application down.\n\nRestore the service:\n\n1. Make the node schedulable again (uncordon it)\n2. Remove the `dedicated=critical` taint from the node\n3. Bring the `critical-app` deployment back to 3 running replicas on that node",
+      "concepts": ["cluster-maintenance", "cordon", "taints", "troubleshooting"],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Node k3d-cluster-agent-1 is uncordoned",
+          "verificationScriptFile": "q16_s1_validate_node_uncordoned.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "The dedicated=critical taint is removed",
+          "verificationScriptFile": "q16_s2_validate_taint_removed.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "3",
+          "description": "critical-app has 3 ready replicas",
+          "verificationScriptFile": "q16_s3_validate_deployment_ready.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "4",
+          "description": "All critical-app pods run on k3d-cluster-agent-1",
+          "verificationScriptFile": "q16_s4_validate_pods_on_target_node.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        }
+      ]
+    }
+  ]
+}

@@ -41,6 +41,16 @@
         "examDurationInMinutes": 120
       },
       {
+        "id": "cka-003",
+        "assetPath": "assets/exams/cka/003",
+        "name": "CKA Practice Lab - Troubleshooting & Maintenance",
+        "category": "CKA",
+        "description": "16-question lab progressing from simple to hard, focused on CKA curriculum gaps: kubectl output tasks, node scheduling, Jobs, CSR approval, PVC expansion, service and network policy debugging, kubectl debug with ephemeral containers, deprecated API conversion, RBAC 403 troubleshooting, topology spread, multi-fault repair, and node maintenance recovery.",
+        "warmUpTimeInSeconds": 260,
+        "difficulty": "Medium",
+        "examDurationInMinutes": 90
+      },
+      {
         "id": "cka-001",
         "assetPath": "assets/exams/cka/001",
         "name": "CKA Practice Lab - Core Concepts",
