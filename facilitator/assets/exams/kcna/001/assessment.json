@@ -627,7 +627,7 @@
         "To reserve budget for future node autoscaling"
       ],
       "answer": "B",
-      "explanation": "A PDB guards against voluntary disruptions: cluster upgrades and kubectl drain will respect it and only evict as many Pods as allowed. It does not protect against node failures or crashes ( involuntary disruptions).",
+      "explanation": "A PDB guards against voluntary disruptions: cluster upgrades and kubectl drain will respect it and only evict as many Pods as allowed. It does not protect against node failures or crashes (involuntary disruptions).",
       "concepts": ["pod-disruption-budget", "availability", "reliability"]
     },
     {

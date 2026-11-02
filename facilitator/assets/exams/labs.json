@@ -31,6 +31,16 @@
         "examDurationInMinutes": 120
       },
       {
+        "id": "kcsa-001",
+        "assetPath": "assets/exams/kcsa/001",
+        "name": "KCSA Mock Exam - Kubernetes & Cloud Security Associate",
+        "category": "KCSA",
+        "description": "60-question multiple-choice mock exam matching the official KCSA blueprint: 90 minutes, 75% pass mark, weighted across Overview of Cloud Native Security (14%), Kubernetes Cluster Component Security (22%), Kubernetes Security Fundamentals (22%), Kubernetes Threat Model (16%), Platform Security (16%), and Compliance and Security Frameworks (10%). Every answer is graded instantly with an explanation and a domain-wise performance breakdown.",
+        "warmUpTimeInSeconds": 10,
+        "difficulty": "Easy",
+        "examDurationInMinutes": 90
+      },
+      {
         "id": "kcna-001",
         "assetPath": "assets/exams/kcna/001",
         "name": "KCNA Mock Exam - Kubernetes & Cloud Native Associate",

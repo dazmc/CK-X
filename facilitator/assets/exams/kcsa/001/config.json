@@ -1,0 +1,10 @@
+{
+  "lab": "kcsa-001",
+  "skipClusterSetup": true,
+  "answers": "assets/exams/kcsa/001/answers.md",
+  "questions": "assessment.json",
+  "totalMarks": 60,
+  "lowScore": 45,
+  "mediumScore": 52,
+  "highScore": 57
+}

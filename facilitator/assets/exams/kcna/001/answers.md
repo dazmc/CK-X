@@ -550,7 +550,7 @@ What is the purpose of a PodDisruptionBudget (PDB)?
 - C. To set CPU and memory budgets for a Pod
 - D. To reserve budget for future node autoscaling
 
-*A PDB guards against voluntary disruptions: cluster upgrades and kubectl drain will respect it and only evict as many Pods as allowed. It does not protect against node failures or crashes ( involuntary disruptions).*
+*A PDB guards against voluntary disruptions: cluster upgrades and kubectl drain will respect it and only evict as many Pods as allowed. It does not protect against node failures or crashes (involuntary disruptions).*
 
 ### Question 43
 
