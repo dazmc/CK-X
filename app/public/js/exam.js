@@ -727,12 +727,32 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize the exam UI
     function initExamUI() {
         if (isPlayground) {
-            // Playground: no questions - hide the question pane so the terminal is full width
-            const questionPanel = document.getElementById('questionPanel');
-            const panelDivider = document.getElementById('panelDivider');
-            if (questionPanel) questionPanel.style.display = 'none';
-            if (panelDivider) panelDivider.style.display = 'none';
+            // Playground: no question navigation - show connection info instead
+            const questionNav = document.querySelector('.question-nav');
+            if (questionNav) questionNav.style.display = 'none';
+            
+            const hostname = examInfo.info?.config?.machineHostname || 'ckad9999';
             endExamBtnDropdown.textContent = 'End Session';
+            questionContent.innerHTML = `
+                <div class="d-flex flex-column" style="height: 100%;">
+                    <div class="question-header">
+                        <div class="mb-3">
+                            <h5 class="mb-0">🏖️ Playground</h5>
+                        </div>
+                        <div class="mb-3">
+                            <strong>SSH to instance:</strong> <span class="inline-code">ssh ${hostname}</span>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Session:</strong> <span class="text-primary">2 hours, no grading</span>
+                        </div>
+                        <hr class="my-3">
+                    </div>
+                    <div class="question-body">
+                        <p>Open a terminal on the remote desktop and run <span class="inline-code">ssh ${hostname}</span> - kubectl is preconfigured there. Click any highlighted text to copy it.</p>
+                        <p>This sandbox has no questions and no grading. Experiment freely until the timer hits 0:00, when the cluster is deleted automatically.</p>
+                    </div>
+                </div>
+            `;
         } else {
             // Set the first question
             updateQuestionContent(currentQuestionId);
