@@ -280,6 +280,22 @@ document.addEventListener('DOMContentLoaded', function() {
         // Get unique categories
         const categories = [...new Set(labs.map(lab => lab.category))];
         
+        // Display names for categories that aren't certification types
+        const categoryLabels = {
+            'Playground': 'Playground - Kubernetes Sandpit'
+        };
+        
+        // Add any categories missing from the hardcoded dropdown so new
+        // lab types (e.g. Playground) show up without touching the HTML
+        categories.forEach(category => {
+            if (!examCategorySelect.querySelector(`option[value="${category}"]`)) {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = categoryLabels[category] || category;
+                examCategorySelect.appendChild(option);
+            }
+        });
+        
         // If CKAD is available, select it by default
         if (categories.includes('CKAD')) {
             examCategorySelect.value = 'CKAD';
