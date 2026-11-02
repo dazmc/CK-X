@@ -60,4 +60,7 @@ coverage/
 .terraform/
 terraform.tfstate
 terraform.tfstate.backup
-.terragrunt-cache/ Screenshot*.png
+.terragrunt-cache/
+
+# Screenshots
+Screenshot*.png
