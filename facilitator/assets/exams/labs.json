@@ -51,6 +51,16 @@
         "examDurationInMinutes": 90
       },
       {
+        "id": "playground-001",
+        "assetPath": "assets/exams/playground/001",
+        "name": "Playground - Kubernetes Sandpit",
+        "category": "Playground",
+        "description": "A question-free 2-hour sandbox on a real 2-worker Kubernetes cluster. Experiment freely with kubectl, taints, DaemonSets, networking, storage - whatever you like. The session hard-stops at 0:00 and the cluster is deleted automatically.",
+        "warmUpTimeInSeconds": 260,
+        "difficulty": "Easy",
+        "examDurationInMinutes": 120
+      },
+      {
         "id": "cka-002",
         "assetPath": "assets/exams/cka/002",
         "name": "CKA Practice Lab - Advanced Administration",

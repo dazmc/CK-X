@@ -328,6 +328,17 @@ async function getExamQuestions(examId) {
  */
 async function evaluateExam(examId, evaluationData) {
   try {
+    // Playground labs have no questions to grade: "evaluating" one just
+    // tears the session down (defensive - the frontend never calls this)
+    const examInfo = await redisClient.getExamInfo(examId);
+    if (!examInfo) {
+      throw new Error(`Exam not found with ID: ${examId}`);
+    }
+    if (examInfo.config && examInfo.config.labType === 'playground') {
+      logger.info(`Playground lab ${examId} evaluated - ending session instead of grading`);
+      return await endExam(examId);
+    }
+
     // Update exam status to EVALUATING
     await redisClient.updateExamStatus(examId, 'EVALUATING');
 
@@ -336,12 +347,6 @@ async function evaluateExam(examId, evaluationData) {
         examEvaluationState: 'EVALUATING'
       }
     });
-    
-    // Get exam data and question information
-    const examInfo = await redisClient.getExamInfo(examId);
-    if (!examInfo) {
-      throw new Error(`Exam not found with ID: ${examId}`);
-    }
     
     // Get assessment path information
     const assetPath = examInfo.assetPath;

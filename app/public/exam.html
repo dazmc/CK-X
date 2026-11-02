@@ -35,10 +35,10 @@
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-info mb-3">
-                        <strong>Time's up! ⏳ Your exam has ended. </strong>
+                        <strong id="examEndAlertText">Time's up! ⏳ Your exam has ended. </strong>
                     </div>
-                    <p>We're now evaluating your results.</p>
-                    <p>Your environment session will remain available for review until you choose to end it.</p>
+                    <p id="examEndMsg1">We're now evaluating your results.</p>
+                    <p id="examEndMsg2">Your environment session will remain available for review until you choose to end it.</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" id="viewResultsBtn">View Results</button>
@@ -210,14 +210,14 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">End Exam Confirmation</h5>
+                    <h5 class="modal-title" id="confirmModalTitle">End Exam Confirmation</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Are you sure you want to end the exam? This action cannot be undone.</p>
+                    <p id="confirmModalBodyText">Are you sure you want to end the exam? This action cannot be undone.</p>
                     <div class="alert alert-success mt-2">
                         <p class="mb-1"><strong>What happens next:</strong></p>
-                        <ul class="mb-0">
+                        <ul class="mb-0" id="confirmModalList">
                             <li>Your submissions will be evaluated.</li>
                             <li>You will be redirected to the results page.</li>
                             <li>Your session will remain intact until you choose to terminate it.</li>

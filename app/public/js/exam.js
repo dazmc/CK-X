@@ -46,6 +46,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let questions = [];
     let isTerminalActive = false;
     let isCompletedExamMode = false;
+    let isPlayground = false; // Question-free sandbox session (labType === 'playground')
+    let playgroundEnded = false; // Guards the 0:00 hard-stop from double-firing
     
     // Add event listener for page unload to clean up resources
     window.addEventListener('beforeunload', cleanupResources);
@@ -223,6 +225,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     .then(data => {
                         examInfo = data;
                         
+                        // Detect question-free playground sessions
+                        isPlayground = data.info?.config?.labType === 'playground';
+                        
                         // Set timer based on examDurationInMinutes and examStartTime if available
                         if (data.info) {
                             if (data.info.events?.examStartTime && data.info.examDurationInMinutes) {
@@ -283,8 +288,36 @@ document.addEventListener('DOMContentLoaded', function() {
             setupNewExamButton();
         }
         
+        // Swap in sandbox wording for playground sessions
+        if (isPlayground) applyPlaygroundStartModalText();
+        
         // Always show the modal regardless of exam state
         startExamModal.show();
+    }
+    
+    // Replace the start modal copy with playground (no-questions) wording
+    function applyPlaygroundStartModalText() {
+        const inProgress = !!examInfo.info?.events?.examStartTime;
+        
+        if (inProgress) {
+            document.getElementById('startExamModalLabel').textContent =
+                examInfo.info.events.examEndTime ? 'Session Completed' : 'Session in Progress';
+            return;
+        }
+        
+        document.getElementById('startExamModalLabel').textContent = 'Ready to Start Your Playground';
+        document.getElementById('newExamContent').innerHTML = `
+            <div class="alert alert-info mb-3">
+                <strong>Playground:</strong> This is an open sandbox - no questions, no grading. A real 2-worker Kubernetes cluster is yours for 2 hours.
+            </div>
+            <p>When you click "Start Session", the following will happen:</p>
+            <ul>
+                <li>Your 2-hour session timer will begin counting down.</li>
+                <li>You will be connected to the Kubernetes environment.</li>
+                <li>The application will enter fullscreen mode.</li>
+                <li>At 0:00 the session hard-stops: the cluster is deleted automatically.</li>
+            </ul>
+            <p class="mb-0">Have fun, and don't break anything you can't fix. 🛠️</p>`;
     }
     
     // Setup button for continuing an existing exam
@@ -300,7 +333,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('examInProgressContent').style.display = 'none';
             
             // Update modal title
-            modalTitle.textContent = 'Exam Completed';
+            modalTitle.textContent = isPlayground ? 'Session Completed' : 'Exam Completed';
             startExamBtn.textContent = 'Continue to Session';
         } else {
             // Exam is in progress - show in-progress content
@@ -308,7 +341,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('examCompletedContent').style.display = 'none';
             
             // Update modal title
-            modalTitle.textContent = 'Exam in Progress';
+            modalTitle.textContent = isPlayground ? 'Session in Progress' : 'Exam in Progress';
             startExamBtn.textContent = 'Continue Session';
         }
         
@@ -327,11 +360,12 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('examCompletedContent').style.display = 'none';
         
         // Reset modal title
-        document.getElementById('startExamModalLabel').textContent = 'Ready to Begin Your Exam';
+        document.getElementById('startExamModalLabel').textContent = isPlayground ? 'Ready to Start Your Playground' : 'Ready to Begin Your Exam';
         
         // Initialize counter
         let countDown = 3;
-        startExamBtn.innerHTML = `Start Exam (${countDown})`;
+        const startLabel = isPlayground ? 'Start Session' : 'Start Exam';
+        startExamBtn.innerHTML = `${startLabel} (${countDown})`;
         
         // Remove any existing click handlers
         startExamBtn.replaceWith(startExamBtn.cloneNode(true));
@@ -346,7 +380,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (countDown > 0) {
                     // Update button text with new counter
-                    freshStartExamBtn.innerHTML = `Start Exam (${countDown})`;
+                    freshStartExamBtn.innerHTML = `${startLabel} (${countDown})`;
                 } else {
                     // Start exam when counter reaches 0
                     freshStartExamBtn.removeEventListener('click', handleStartClick);
@@ -394,7 +428,7 @@ document.addEventListener('DOMContentLoaded', function() {
         TimerService.registerTimeThresholdCallbacks({
             // 30 minutes remaining
             30: (minutes) => {
-                UiUtils.showToast('30 minutes left in your exam', {
+                UiUtils.showToast(isPlayground ? '30 minutes left in your playground session' : '30 minutes left in your exam', {
                     bgColor: 'bg-warning',
                     textColor: 'text-dark',
                     delay: 7000
@@ -402,7 +436,7 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             // 10 minutes remaining
             10: (minutes) => {
-                UiUtils.showToast('Only 10 minutes remaining! ', {
+                UiUtils.showToast(isPlayground ? 'Only 10 minutes left in your session! ' : 'Only 10 minutes remaining! ', {
                     bgColor: 'bg-danger',
                     textColor: 'text-white',
                     delay: 10000
@@ -472,6 +506,44 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Handle exam end when timer reaches zero
     function handleExamEnd() {
+        // Playground hard stop: terminate the session instead of grading
+        if (isPlayground) {
+            if (playgroundEnded) return; // Timer end can fire twice (onTimerEnd + threshold callback)
+            playgroundEnded = true;
+            
+            // Release wake lock as session is ending
+            WakeLockService.releaseWakeLock();
+            
+            // Retext the end modal for a sandbox session
+            document.getElementById('examEndModalLabel').textContent = 'Session Time Complete';
+            document.getElementById('examEndAlertText').textContent = "Time's up! ⏳ Your playground session has ended.";
+            document.getElementById('examEndMsg1').textContent = 'Your cluster is being deleted now.';
+            document.getElementById('examEndMsg2').textContent = 'Playground sessions are not graded - there are no results to view.';
+            if (viewResultsBtn) {
+                viewResultsBtn.textContent = 'Back to Home';
+                viewResultsBtn.addEventListener('click', () => {
+                    window.location.href = '/';
+                });
+            }
+            
+            // Show the session end modal
+            examEndModal.show();
+            
+            // Tear the cluster down right away
+            const examId = ExamApi.getExamId();
+            if (examId) {
+                ExamApi.terminateSession(examId)
+                    .then(data => {
+                        console.log('Playground session terminated:', data);
+                        TimerService.stopTimer();
+                    })
+                    .catch(error => {
+                        console.error('Error terminating playground session:', error);
+                    });
+            }
+            return;
+        }
+        
         // Release wake lock as exam is ending
         WakeLockService.releaseWakeLock()
             .then(success => {
@@ -654,14 +726,23 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize the exam UI
     function initExamUI() {
-        // Set the first question
-        updateQuestionContent(currentQuestionId);
-        
-        // Dynamically populate question dropdown with fetched questions
-        updateQuestionDropdown();
-        
-        // Update navigation buttons
-        updateNavigationButtons();
+        if (isPlayground) {
+            // Playground: no questions - hide the question pane so the terminal is full width
+            const questionPanel = document.getElementById('questionPanel');
+            const panelDivider = document.getElementById('panelDivider');
+            if (questionPanel) questionPanel.style.display = 'none';
+            if (panelDivider) panelDivider.style.display = 'none';
+            endExamBtnDropdown.textContent = 'End Session';
+        } else {
+            // Set the first question
+            updateQuestionContent(currentQuestionId);
+            
+            // Dynamically populate question dropdown with fetched questions
+            updateQuestionDropdown();
+            
+            // Update navigation buttons
+            updateNavigationButtons();
+        }
         
         // Setup Remote Desktop frame handlers
         RemoteDesktopService.setupRemoteDesktopFrameHandlers(vncFrame, showVncConnectionStatus);
@@ -807,6 +888,16 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // End exam button (dropdown option)
     endExamBtnDropdown.addEventListener('click', () => {
+        // Playground: the confirm modal talks about ending a session, not grading
+        if (isPlayground) {
+            document.getElementById('confirmModalTitle').textContent = 'End Session Confirmation';
+            document.getElementById('confirmModalBodyText').textContent = 'Are you sure you want to end your playground session? This action cannot be undone.';
+            document.getElementById('confirmModalList').innerHTML = `
+                <li>Your cluster and everything in it will be deleted.</li>
+                <li>You will be returned to the home page.</li>
+                <li>Playground sessions are not graded - there are no results.</li>`;
+            document.getElementById('confirmEndBtn').textContent = 'End Session';
+        }
         confirmModal.show();
     });
     
@@ -821,6 +912,23 @@ document.addEventListener('DOMContentLoaded', function() {
         // Get exam ID
         const examId = ExamApi.getExamId();
         if (!examId) return;
+        
+        // Playground: ending means terminating the cluster, no evaluation
+        if (isPlayground) {
+            trackExamEndEvent()
+                .then(() => ExamApi.terminateSession(examId))
+                .then(data => {
+                    console.log('Playground session ended:', data);
+                    TimerService.stopTimer();
+                    window.location.href = '/';
+                })
+                .catch(error => {
+                    console.error('Error ending playground session:', error);
+                    pageLoader.style.display = 'none';
+                    alert('There was an error ending your session. Please try again or use Terminate Session.');
+                });
+            return;
+        }
         
         // Track exam end event
         trackExamEndEvent()

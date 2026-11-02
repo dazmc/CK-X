@@ -1,0 +1,6 @@
+{
+  "lab": "playground-001",
+  "workerNodes": 2,
+  "labType": "playground",
+  "questions": "assessment.json"
+}

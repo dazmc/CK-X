@@ -284,6 +284,30 @@ Labs can also be pure multiple-choice mock exams (like `kcna-001`) that need no 
 
 The webapp submits the selected options with the evaluate call (`{ answers: { "1": "B", ... } }`). The facilitator grades them locally (no SSH, no jumphost) and merges them into the standard result shape, so the results page shows per-question correctness, explanations, and the domain breakdown. Answers are persisted in Redis so the results page's *Re-evaluate* button keeps working. Results show pass/fail against a 75% pass mark.
 
+## Playground Labs
+
+A playground (like `playground-001`) is a question-free sandbox: a real multi-node cluster with a countdown timer and a full-width terminal. There is no grading and no results page.
+
+### config.json
+
+```json
+{
+  "lab": "playground-001",
+  "workerNodes": 2,
+  "labType": "playground",
+  "questions": "assessment.json"
+}
+```
+
+- `labType: "playground"` is the flag everything keys off. The cluster **is** provisioned (that is the point), so do **not** set `skipClusterSetup`.
+- `assessment.json` is just `{ "questions": [] }` - the empty list keeps every existing endpoint working.
+
+### How it behaves
+
+- **Registry**: add a `labs.json` entry with its own category (e.g. `Playground`) and `examDurationInMinutes` - this is the hard-stop session length (minutes).
+- **Frontend** (`app/public/js/exam.js`): when `labType === 'playground'`, the question panel and divider are hidden, the start/confirm/end modals use session wording, and the timer's 0:00 handler calls `terminateSession` (not `evaluate`) - the cluster is deleted immediately and the end modal offers *Back to Home* instead of *View Results*. The **End Session** button follows the same terminate path.
+- **Facilitator**: `evaluateExam` detects a playground and delegates to `endExam` instead of grading - a defensive guard, since the frontend never calls evaluate for a sandbox.
+
 ## Best Practices
 
 1. **Realistic Scenarios**: Design questions that mimic real certification exam tasks
