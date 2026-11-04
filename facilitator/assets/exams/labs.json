@@ -21,11 +21,31 @@
         "examDurationInMinutes": 120
       },
       {
+        "id": "ckad-003",
+        "assetPath": "assets/exams/ckad/003",
+        "name": "CKAD Lightning Lab - KodeKloud Mock",
+        "category": "CKAD",
+        "description": "Hands-on CKAD tasks adapted from KodeKloud's Lightning Labs 1 and 2 (credited to KodeKloud): PV/PVC binding, NetworkPolicies, ConfigMap-driven pods, deployment rollout and rollback, resource requests and volumes, probe troubleshooting, CronJobs, secret volume mounts, ingress routing, and log filtering.",
+        "warmUpTimeInSeconds": 260,
+        "difficulty": "Medium",
+        "examDurationInMinutes": 120
+      },
+      {
         "id": "cks-001",
         "assetPath": "assets/exams/cks/001",
         "name": "CKS Practice Lab - Kubernetes Security Essentials",
         "category": "CKS",
         "description": "Practice essential Kubernetes security concepts including network policies, RBAC, supply chain security, and runtime protection",
+        "warmUpTimeInSeconds": 260,
+        "difficulty": "Hard",
+        "examDurationInMinutes": 120
+      },
+      {
+        "id": "cks-002",
+        "assetPath": "assets/exams/cks/002",
+        "name": "CKS Mock Exam Practice - KodeKloud Mocks 1-3",
+        "category": "CKS",
+        "description": "Kubernetes security tasks adapted from KodeKloud's CKS Mock Exams 1-3 (credited to KodeKloud): secret extraction and read-only mounting, ingress-restricting NetworkPolicies, service account token unmounting, least-privilege RBAC, immutability triage, and RuntimeClass sandboxing.",
         "warmUpTimeInSeconds": 260,
         "difficulty": "Hard",
         "examDurationInMinutes": 120

@@ -1,0 +1,291 @@
+{
+  "questions": [
+    {
+      "id": "1",
+      "namespace": "orion",
+      "machineHostname": "ckad9999",
+      "question": "A pod called `app-xyz` has been created in the `orion` namespace. It uses a secret as environment variables.\n\n1. Extract the decoded value of the `CONNECTOR_PASSWORD` key from the Secret and save it to the file `/tmp/exam/secrets/CONNECTOR_PASSWORD` on `ckad9999`.\n2. Then recreate the pod so that instead of using the secret as an environment variable, the secret is mounted as a **read-only** volume at the path `/mnt/connector/password` for the application to use.\n\nYou may delete and recreate the pod.",
+      "concepts": [
+        "secrets",
+        "volumes",
+        "security"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "File /tmp/exam/secrets/CONNECTOR_PASSWORD contains the decoded CONNECTOR_PASSWORD value",
+          "verificationScriptFile": "q1_s1_validate_secret_file.sh",
+          "expectedOutput": "0",
+          "weightage": 5
+        },
+        {
+          "id": "2",
+          "description": "Pod app-xyz mounts the secret read-only at /mnt/connector/password (and no longer sets it as an env var)",
+          "verificationScriptFile": "q1_s2_validate_mount.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "3",
+          "description": "Pod app-xyz is Ready",
+          "verificationScriptFile": "q1_s3_validate_ready.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "namespace": "prod-x12cs",
+      "machineHostname": "ckad9999",
+      "question": "A pod called `redis-backend` exists in the `prod-x12cs` namespace and is exposed as a `ClusterIP` service on port `6379`.\n\nUsing a NetworkPolicy called `allow-redis-access` in the `prod-x12cs` namespace, lock down incoming connections to this pod to only:\n\n1. Any pod in the same namespace with the label `backend=prod-x12cs`\n2. All pods in the `prod-yx13cs` namespace (its namespace carries the label `access=redis` - use a namespaceSelector with the existing label)\n\nAll other incoming connections must be blocked. Select the pod with its existing label `run=redis-backend` and restrict traffic to TCP port `6379`.",
+      "concepts": [
+        "networkpolicies",
+        "networking",
+        "selectors"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "NetworkPolicy allow-redis-access selects run=redis-backend and declares policy type Ingress",
+          "verificationScriptFile": "q2_s1_validate_policy.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "2",
+          "description": "Ingress allows pods in the same namespace labeled backend=prod-x12cs",
+          "verificationScriptFile": "q2_s2_validate_pod_selector.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "3",
+          "description": "Ingress allows the prod-yx13cs namespace via namespaceSelector access=redis",
+          "verificationScriptFile": "q2_s3_validate_ns_selector.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "4",
+          "description": "Ingress restricted to TCP port 6379",
+          "verificationScriptFile": "q2_s4_validate_port.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "namespace": "gamma",
+      "machineHostname": "ckad9999",
+      "question": "A pod called `apps-cluster-dash` in the `gamma` namespace was created with the service account `cluster-view`, which has cluster-wide view permissions. The secret token is still mounted into the pod.\n\nSecure the pod so that the service account secret token is **no longer mounted** into it. You may delete and recreate the pod. Keep using the `cluster-view` service account.",
+      "concepts": [
+        "service accounts",
+        "automountServiceAccountToken",
+        "secrets"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Pod apps-cluster-dash sets automountServiceAccountToken: false",
+          "verificationScriptFile": "q3_s1_validate_automount.sh",
+          "expectedOutput": "0",
+          "weightage": 5
+        },
+        {
+          "id": "2",
+          "description": "No service account token volume/volumeMount remains in the pod",
+          "verificationScriptFile": "q3_s2_validate_no_token_mount.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "3",
+          "description": "Pod apps-cluster-dash is Ready",
+          "verificationScriptFile": "q3_s3_validate_ready.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "namespace": "dev-z",
+      "machineHostname": "ckad9999",
+      "question": "A developer called `martin` needs access to work on the `dev-a`, `dev-b` and `dev-z` namespaces:\n\n- In `dev-a` and `dev-b` he can perform **any** operation on any pod (this is already correct)\n- In `dev-z` he must only be allowed to `get` and `list` pods\n\nThe current setup in `dev-z` is too permissive. Fix the Role called `dev-user-access` in the `dev-z` namespace so it only grants `get` and `list` on pods. Do not change the roles in `dev-a` or `dev-b`, and keep the same role name.",
+      "concepts": [
+        "rbac",
+        "roles",
+        "least privilege"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Role dev-user-access in dev-z grants only get and list on pods",
+          "verificationScriptFile": "q4_s1_validate_devz_role.sh",
+          "expectedOutput": "0",
+          "weightage": 6
+        },
+        {
+          "id": "2",
+          "description": "Roles in dev-a and dev-b are unchanged (full pod access for martin)",
+          "verificationScriptFile": "q4_s2_validate_other_roles.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "3",
+          "description": "RoleBindings still bind dev-user-access to martin in all three namespaces",
+          "verificationScriptFile": "q4_s3_validate_bindings.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "4",
+          "description": "martin can no longer create pods in dev-z but still can in dev-a",
+          "verificationScriptFile": "q4_s4_validate_cani.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "namespace": "dev",
+      "machineHostname": "ckad9999",
+      "question": "In the `dev` namespace (create it if needed), create the following resources:\n\n1. A Role called `dev-write` granting `get`, `watch`, `list` and `create` on pods in the same namespace\n2. A ServiceAccount called `developer`\n3. A RoleBinding called `dev-write-binding` that binds the `dev-write` role to the `developer` ServiceAccount\n4. A pod using the template provided at `/tmp/exam/dev-pod.yaml`. The pod must run with the `developer` service account (update the template as necessary before creating it).",
+      "concepts": [
+        "rbac",
+        "roles",
+        "rolebindings",
+        "service accounts"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Role dev-write grants get,watch,list,create on pods in dev",
+          "verificationScriptFile": "q5_s1_validate_role.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "2",
+          "description": "ServiceAccount developer and RoleBinding dev-write-binding exist and are correctly linked",
+          "verificationScriptFile": "q5_s2_validate_sa_binding.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "3",
+          "description": "Pod from the template runs with serviceAccountName developer",
+          "verificationScriptFile": "q5_s3_validate_pod.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "4",
+          "description": "The developer ServiceAccount can create pods in dev",
+          "verificationScriptFile": "q5_s4_validate_cani.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        }
+      ]
+    },
+    {
+      "id": "6",
+      "namespace": "alpha",
+      "machineHostname": "ckad9999",
+      "question": "Pods have been created in the `alpha` namespace. Delete every pod that is **not immutable**.\n\nA pod counts as immutable when its container sets `readOnlyRootFilesystem: true`. Remember the default when the field is not present.",
+      "concepts": [
+        "immutability",
+        "security context",
+        "troubleshooting"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Immutable pod solaris (readOnlyRootFilesystem: true) still exists",
+          "verificationScriptFile": "q6_s1_validate_immutable_exists.sh",
+          "expectedOutput": "0",
+          "weightage": 5
+        },
+        {
+          "id": "2",
+          "description": "Mutable pod sonata (readOnlyRootFilesystem: false) was deleted",
+          "verificationScriptFile": "q6_s2_validate_sonata_deleted.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "3",
+          "description": "Pod triton (field absent, defaults to mutable) was deleted",
+          "verificationScriptFile": "q6_s3_validate_triton_deleted.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        }
+      ]
+    },
+    {
+      "id": "7",
+      "namespace": "omni",
+      "machineHostname": "ckad9999",
+      "question": "A pod called `frontend-site` has been created in the `omni` namespace with more permissions than it needs. Several service accounts exist in the namespace (`fe`, `frontend`, `frontend-default`, plus `default`).\n\nApply the principle of least privilege:\n\n1. Recreate the pod `frontend-site` using the service account with the **minimum privileges** (excluding the `default` service account - inspect the RoleBindings to find which service account has no permissions).\n2. Once the pod runs under the correct service account, delete the other unused service accounts in `omni` (excluding `default` and the one you selected).",
+      "concepts": [
+        "service accounts",
+        "rbac",
+        "least privilege"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Pod frontend-site runs under the least-privilege service account frontend-default",
+          "verificationScriptFile": "q7_s1_validate_pod_sa.sh",
+          "expectedOutput": "0",
+          "weightage": 5
+        },
+        {
+          "id": "2",
+          "description": "Unused service accounts fe and frontend are deleted",
+          "verificationScriptFile": "q7_s2_validate_sas_deleted.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "3",
+          "description": "frontend-default still exists and the pod is Ready",
+          "verificationScriptFile": "q7_s3_validate_ready.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        }
+      ]
+    },
+    {
+      "id": "8",
+      "namespace": "production",
+      "machineHostname": "ckad9999",
+      "question": "A pod called `busy-rx100` has been created in the `production` namespace. Secure the pod by recreating it with the RuntimeClass called `gvisor`. You may delete and recreate the pod.\n\nNote: the gvisor runtime itself is not installed in this cluster - the pod may not start. What matters is that the pod is correctly configured.",
+      "concepts": [
+        "runtime classes",
+        "container sandboxing",
+        "pods"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Pod busy-rx100 sets runtimeClassName: gvisor",
+          "verificationScriptFile": "q8_s1_validate_runtimeclass.sh",
+          "expectedOutput": "0",
+          "weightage": 6
+        },
+        {
+          "id": "2",
+          "description": "Pod busy-rx100 still exists in production with image nginx and label run=busy-rx100",
+          "verificationScriptFile": "q8_s2_validate_pod.sh",
+          "expectedOutput": "0",
+          "weightage": 6
+        }
+      ]
+    }
+  ]
+}

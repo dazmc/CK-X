@@ -1,0 +1,378 @@
+{
+  "questions": [
+    {
+      "id": "1",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "Create a PersistentVolume called `log-volume` with the following specifications:\n\n- storageClassName: `manual`\n- accessMode: `ReadWriteMany`\n- capacity: `1Gi`\n- hostPath path: `/opt/volume/nginx`\n\nNext, create a PersistentVolumeClaim called `log-claim` requesting `200Mi` of storage with access mode `ReadWriteMany` and storage class `manual`. The claim must bind to `log-volume`.\n\nFinally, create a pod called `logger` in the `default` namespace using the image `nginx:alpine` that mounts this claim at `/var/www/nginx`.",
+      "concepts": [
+        "persistentvolumes",
+        "persistentvolumeclaims",
+        "storage",
+        "volumes"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "PersistentVolume log-volume has 1Gi, ReadWriteMany, class manual and hostPath /opt/volume/nginx",
+          "verificationScriptFile": "q1_s1_validate_pv.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "2",
+          "description": "PersistentVolumeClaim log-claim (200Mi, ReadWriteMany, manual) is Bound to log-volume",
+          "verificationScriptFile": "q1_s2_validate_pvc.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "3",
+          "description": "Pod logger mounts claim log-claim at /var/www/nginx and is Ready",
+          "verificationScriptFile": "q1_s3_validate_pod.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "A pod called `secure-pod` and a service called `secure-service` are deployed in the `default` namespace, but incoming connections to the pod are blocked by an existing default-deny NetworkPolicy.\n\nCreate a NetworkPolicy called `allow-webapp-color` in the `default` namespace that:\n\n- selects the pods with the label `run=secure-pod`\n- declares policy type `Ingress`\n- allows ingress on TCP port `80` from pods with the label `name=webapp-color`\n\nDo not delete or modify any existing objects.",
+      "concepts": [
+        "networkpolicies",
+        "networking",
+        "troubleshooting"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "NetworkPolicy allow-webapp-color selects run=secure-pod with policy type Ingress",
+          "verificationScriptFile": "q2_s1_validate_policy.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "Ingress rule allows traffic from pods labeled name=webapp-color",
+          "verificationScriptFile": "q2_s2_validate_from.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "3",
+          "description": "Ingress rule allows TCP port 80",
+          "verificationScriptFile": "q2_s3_validate_port.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "4",
+          "description": "Existing objects (default-deny-all policy, secure-pod, secure-service) are untouched",
+          "verificationScriptFile": "q2_s4_validate_originals.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "namespace": "dvl1987",
+      "machineHostname": "ckad9999",
+      "question": "Create a pod called `time-check` in the `dvl1987` namespace (create the namespace if it does not exist).\n\nThe pod should run a container called `time-check` using the `busybox` image with these requirements:\n\n- An environment variable `TIME_FREQ` whose value comes from the key `TIME_FREQ` of a ConfigMap called `time-config` in the same namespace (create the ConfigMap with the value `10`)\n- An `emptyDir` volume called `log-volume` mounted at `/opt/time`\n- A command that runs in a shell and appends the current date to `/opt/time/time-check.log`, then sleeps for `$TIME_FREQ` seconds, looping forever",
+      "concepts": [
+        "configmaps",
+        "environment variables",
+        "volumes",
+        "pods"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Namespace dvl1987 exists and ConfigMap time-config has TIME_FREQ=10",
+          "verificationScriptFile": "q3_s1_validate_config.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "Pod time-check gets TIME_FREQ from ConfigMap time-config key TIME_FREQ",
+          "verificationScriptFile": "q3_s2_validate_env.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "3",
+          "description": "emptyDir volume log-volume is mounted at /opt/time",
+          "verificationScriptFile": "q3_s3_validate_volume.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "4",
+          "description": "Container command loops in a shell appending the date to /opt/time/time-check.log with sleep $TIME_FREQ",
+          "verificationScriptFile": "q3_s4_validate_command.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "Create a deployment called `nginx-deploy` in the `default` namespace with one container using image `nginx:1.16` and `4` replicas.\n\nThe deployment must use the `RollingUpdate` strategy with `maxSurge=1` and `maxUnavailable=2`.\n\nNext, upgrade the deployment to image `nginx:1.17`. Once all pods are updated, roll the deployment back to the previous version (`nginx:1.16`).",
+      "concepts": [
+        "deployments",
+        "rolling updates",
+        "rollout",
+        "strategy"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Deployment nginx-deploy has 4 replicas with RollingUpdate strategy maxSurge=1 maxUnavailable=2",
+          "verificationScriptFile": "q4_s1_validate_strategy.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "2",
+          "description": "Rollout history records the image update (at least 2 revisions)",
+          "verificationScriptFile": "q4_s2_validate_history.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "3",
+          "description": "All nginx-deploy pods run nginx:1.16 again (rolled back) and 4 are available",
+          "verificationScriptFile": "q4_s3_validate_rollback.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "Create a deployment called `redis` in the `default` namespace using the image `redis:alpine` with exactly `1` replica. The pods must carry the label `app=redis`.\n\nThe container must:\n\n- request `200m` CPU (`0.2` CPU)\n- expose port `6379`\n- mount exactly 2 volumes:\n  - an `emptyDir` volume called `data` at `/redis-master-data`\n  - a ConfigMap volume called `config` referencing the ConfigMap `redis-config` (already created) at `/redis-master`",
+      "concepts": [
+        "deployments",
+        "resource requests",
+        "volumes",
+        "configmaps"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Deployment redis has 1 replica, image redis:alpine and label app=redis",
+          "verificationScriptFile": "q5_s1_validate_deployment.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "Container requests 200m CPU",
+          "verificationScriptFile": "q5_s2_validate_cpu.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "3",
+          "description": "emptyDir data mounted at /redis-master-data and ConfigMap redis-config mounted at /redis-master",
+          "verificationScriptFile": "q5_s3_validate_volumes.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "4",
+          "description": "Container exposes port 6379",
+          "verificationScriptFile": "q5_s4_validate_port.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        }
+      ]
+    },
+    {
+      "id": "6",
+      "namespace": "dev1401",
+      "machineHostname": "ckad9999",
+      "question": "The pod `nginx1401` in the `dev1401` namespace is not in a Ready state. Troubleshoot and fix the issue - the container serves HTTP on port `80`, but the readiness probe is configured against the wrong port.\n\nThen add a liveness probe to the container that:\n\n- runs the command `ls /var/www/html/file_check`\n- starts after an initial delay of `10` seconds (`initialDelaySeconds`)\n- runs every `60` seconds (`periodSeconds`)\n\nYou may delete and recreate the pod. Ignore any warnings the probes produce.",
+      "concepts": [
+        "probes",
+        "readiness",
+        "liveness",
+        "troubleshooting"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Pod nginx1401 is Ready",
+          "verificationScriptFile": "q6_s1_validate_ready.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "Readiness probe uses HTTP GET on port 80",
+          "verificationScriptFile": "q6_s2_validate_readiness.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "3",
+          "description": "Liveness probe execs ls /var/www/html/file_check with initialDelaySeconds=10 and periodSeconds=60",
+          "verificationScriptFile": "q6_s3_validate_liveness.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        }
+      ]
+    },
+    {
+      "id": "7",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "Create a CronJob called `dice` in the `default` namespace:\n\n- schedule: every one minute (`*/1 * * * *`)\n- image: `kodekloud/throw-dice`\n- the job must be non-parallel and complete the task exactly once (`completions: 1`)\n- `backoffLimit: 25`",
+      "concepts": [
+        "cronjobs",
+        "jobs",
+        "scheduling"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "CronJob dice runs every minute with image kodekloud/throw-dice",
+          "verificationScriptFile": "q7_s1_validate_schedule.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "2",
+          "description": "CronJob backoffLimit is 25",
+          "verificationScriptFile": "q7_s2_validate_backoff.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "3",
+          "description": "Job completions is 1",
+          "verificationScriptFile": "q7_s3_validate_completions.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        }
+      ]
+    },
+    {
+      "id": "8",
+      "namespace": "dev2406",
+      "machineHostname": "ckad9999",
+      "question": "Create a pod called `my-busybox` in the `dev2406` namespace (create the namespace if it does not exist) using the `busybox` image.\n\n- The container must be called `secret` and run `sleep 3600`\n- Mount a **read-only** secret volume called `secret-volume` at `/etc/secret-volume` from the Secret `dotfile-secret` (already created in the namespace)\n- The pod must be scheduled on the control-plane node `k3d-cluster-server-0` and no other node",
+      "concepts": [
+        "secrets",
+        "volumes",
+        "scheduling",
+        "nodeSelector"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Container is named secret, uses busybox and runs sleep 3600",
+          "verificationScriptFile": "q8_s1_validate_container.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "Secret dotfile-secret is mounted read-only at /etc/secret-volume via secret-volume",
+          "verificationScriptFile": "q8_s2_validate_secret_mount.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "3",
+          "description": "Pod is scheduled on node k3d-cluster-server-0 (nodeSelector and actual placement)",
+          "verificationScriptFile": "q8_s3_validate_node.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        }
+      ]
+    },
+    {
+      "id": "9",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "Create a single Ingress resource called `ingress-vh-routing` in the `default` namespace that routes HTTP traffic by hostname:\n\n- `http://watch.ecom-store.com/video` → service `video-service` port `8080`\n- `http://apparels.ecom-store.com/wear` → service `apparels-service` port `8080`\n\nAdd the annotation `nginx.ingress.kubernetes.io/rewrite-target=/`.",
+      "concepts": [
+        "ingress",
+        "routing",
+        "services"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Ingress ingress-vh-routing exists",
+          "verificationScriptFile": "q9_s1_validate_ingress.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "2",
+          "description": "Rule for watch.ecom-store.com routes path /video to video-service:8080",
+          "verificationScriptFile": "q9_s2_validate_watch.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "3",
+          "description": "Rule for apparels.ecom-store.com routes path /wear to apparels-service:8080",
+          "verificationScriptFile": "q9_s3_validate_apparels.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "4",
+          "description": "Annotation nginx.ingress.kubernetes.io/rewrite-target=/ is set",
+          "verificationScriptFile": "q9_s4_validate_annotation.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        }
+      ]
+    },
+    {
+      "id": "10",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "A pod called `dev-pod-dind-878516` is running in the `default` namespace with a container called `log-x` whose log output contains `WARNING` lines.\n\nInspect the container logs and redirect all lines containing `WARNING` to the file `/tmp/exam/dind-878516_logs.txt` on `ckad9999`.",
+      "concepts": [
+        "kubectl logs",
+        "logging",
+        "shell redirection"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "File /tmp/exam/dind-878516_logs.txt exists and is not empty",
+          "verificationScriptFile": "q10_s1_validate_file.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "Every line in the file contains WARNING",
+          "verificationScriptFile": "q10_s2_validate_content.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "3",
+          "description": "File line count does not exceed the WARNING lines currently in the container logs",
+          "verificationScriptFile": "q10_s3_validate_count.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        }
+      ]
+    }
+  ]
+}
