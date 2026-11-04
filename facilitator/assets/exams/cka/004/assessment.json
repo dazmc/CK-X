@@ -1,0 +1,341 @@
+{
+  "questions": [
+    {
+      "id": "1",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "Create a pod named `nginx-pod` in the `default` namespace using the image `nginx:alpine`.\n\nThe pod must carry the label `run=nginx-pod`.",
+      "concepts": [
+        "pods",
+        "labels",
+        "kubectl"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Pod nginx-pod exists with image nginx:alpine and label run=nginx-pod",
+          "verificationScriptFile": "q1_s1_validate_pod.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "Pod nginx-pod is Running",
+          "verificationScriptFile": "q1_s2_validate_running.sh",
+          "expectedOutput": "0",
+          "weightage": 5
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "Create a pod named `messaging` in the `default` namespace using the image `redis:alpine`.\n\nThe pod must carry the label `tier=msg`.",
+      "concepts": [
+        "pods",
+        "labels",
+        "kubectl"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Pod messaging exists with image redis:alpine and label tier=msg",
+          "verificationScriptFile": "q2_s1_validate_pod.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "Pod messaging is Running",
+          "verificationScriptFile": "q2_s2_validate_running.sh",
+          "expectedOutput": "0",
+          "weightage": 5
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "Create a namespace named `apx-x9984574`.",
+      "concepts": [
+        "namespaces",
+        "kubectl"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Namespace apx-x9984574 exists",
+          "verificationScriptFile": "q3_s1_validate_namespace.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "2",
+          "description": "Namespace apx-x9984574 is Active",
+          "verificationScriptFile": "q3_s2_validate_active.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "Export the full list of nodes in the cluster as JSON and save it to the file `/tmp/exam/outputs/nodes-z3444kd9.json` on `ckad9999`.\n\nThe file must be valid JSON containing every node in the cluster.",
+      "concepts": [
+        "kubectl",
+        "json output",
+        "cluster-basics"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "File exists and contains a valid node list JSON document",
+          "verificationScriptFile": "q4_s1_validate_json_file.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "The file contains every node currently in the cluster",
+          "verificationScriptFile": "q4_s2_validate_all_nodes.sh",
+          "expectedOutput": "0",
+          "weightage": 5
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "Expose the pod `messaging` on port `6379` with a service named `messaging-service`.\n\nThe service must select the `messaging` pod so it has endpoints.",
+      "concepts": [
+        "services",
+        "selectors",
+        "kubectl expose"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Service messaging-service exists and exposes port 6379",
+          "verificationScriptFile": "q5_s1_validate_service.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "2",
+          "description": "Service selector matches the messaging pod and has endpoints",
+          "verificationScriptFile": "q5_s2_validate_endpoints.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        }
+      ]
+    },
+    {
+      "id": "6",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "Create a deployment named `hr-web-app` in the `default` namespace with `2` replicas using the image `kodekloud/webapp-color`.\n\nThe pods must carry the label `app=hr-web-app`.",
+      "concepts": [
+        "deployments",
+        "replicas",
+        "labels"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Deployment hr-web-app exists with 2 replicas and image kodekloud/webapp-color",
+          "verificationScriptFile": "q6_s1_validate_deployment.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "2",
+          "description": "Deployment selector matches the pod template label app=hr-web-app",
+          "verificationScriptFile": "q6_s2_validate_selector.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "3",
+          "description": "Both replicas are available (2/2 ready)",
+          "verificationScriptFile": "q6_s3_validate_available.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        }
+      ]
+    },
+    {
+      "id": "7",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "Create a static pod manifest for a pod named `static-busybox` on `ckad9999`.\n\nPlace the file at `/etc/kubernetes/manifests/static-busybox.yaml`. The pod must use the image `busybox`, run the command `sleep 1000`, and carry the label `run=static-busybox`.",
+      "concepts": [
+        "static pods",
+        "node configuration",
+        "manifests"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Static pod manifest file exists at /etc/kubernetes/manifests/static-busybox.yaml",
+          "verificationScriptFile": "q7_s1_validate_file.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "Manifest declares a Pod named static-busybox with image busybox, command sleep 1000 and label run=static-busybox",
+          "verificationScriptFile": "q7_s2_validate_content.sh",
+          "expectedOutput": "0",
+          "weightage": 5
+        }
+      ]
+    },
+    {
+      "id": "8",
+      "namespace": "finance",
+      "machineHostname": "ckad9999",
+      "question": "In the namespace `finance`, create a pod named `temp-bus` using the image `redis:alpine`.",
+      "concepts": [
+        "namespaces",
+        "pods",
+        "kubectl run"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Pod temp-bus exists in namespace finance with image redis:alpine",
+          "verificationScriptFile": "q8_s1_validate_pod.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "Pod temp-bus is Running",
+          "verificationScriptFile": "q8_s2_validate_running.sh",
+          "expectedOutput": "0",
+          "weightage": 5
+        }
+      ]
+    },
+    {
+      "id": "9",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "The pod `orange` in the `default` namespace never starts - it is stuck because its container command contains a typo (`sleeeep`).\n\nTroubleshoot the pod and fix it so that it runs successfully. The container command must be `sleep 3000`.\n\nDo not delete the pod name - a pod named `orange` must still exist when you are done.",
+      "concepts": [
+        "troubleshooting",
+        "pods",
+        "kubectl describe"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Pod orange exists in namespace default",
+          "verificationScriptFile": "q9_s1_validate_exists.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "2",
+          "description": "Pod orange is Running",
+          "verificationScriptFile": "q9_s2_validate_running.sh",
+          "expectedOutput": "0",
+          "weightage": 5
+        },
+        {
+          "id": "3",
+          "description": "Container command uses sleep (typo fixed)",
+          "verificationScriptFile": "q9_s3_validate_command.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        }
+      ]
+    },
+    {
+      "id": "10",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "Create a service named `hr-web-app-service` in the `default` namespace for the `hr-web-app` deployment:\n\n- Type: `NodePort`\n- Port: `8080`\n- targetPort: `8080`\n- nodePort: `30082`\n- Selector: `app=hr-web-app`",
+      "concepts": [
+        "services",
+        "nodeport",
+        "selectors"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Service hr-web-app-service is a NodePort on 8080/8080 with nodePort 30082",
+          "verificationScriptFile": "q10_s1_validate_service.sh",
+          "expectedOutput": "0",
+          "weightage": 5
+        },
+        {
+          "id": "2",
+          "description": "Service selector matches hr-web-app pods and has endpoints",
+          "verificationScriptFile": "q10_s2_validate_endpoints.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        }
+      ]
+    },
+    {
+      "id": "11",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "Export the `osImage` of every node in the cluster, space-separated on a single line, to the file `/tmp/exam/outputs/nodes_os_x43kj56.txt` on `ckad9999`.\n\nUse kubectl JSONPath output - one entry per node.",
+      "concepts": [
+        "kubectl",
+        "jsonpath",
+        "cluster-basics"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "File exists and is not empty",
+          "verificationScriptFile": "q11_s1_validate_file.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "The file contains exactly one osImage entry per node in the cluster",
+          "verificationScriptFile": "q11_s2_validate_count.sh",
+          "expectedOutput": "0",
+          "weightage": 5
+        }
+      ]
+    },
+    {
+      "id": "12",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "Create a PersistentVolume named `pv-analytics` with the following specifications:\n\n- Capacity: `100Mi`\n- accessMode: `ReadWriteMany`\n- volumeMode: `Filesystem`\n- hostPath path: `/pv/data-analytics`",
+      "concepts": [
+        "persistentvolumes",
+        "storage",
+        "hostPath"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "PersistentVolume pv-analytics exists with capacity 100Mi and access mode ReadWriteMany",
+          "verificationScriptFile": "q12_s1_validate_pv.sh",
+          "expectedOutput": "0",
+          "weightage": 5
+        },
+        {
+          "id": "2",
+          "description": "PersistentVolume pv-analytics uses hostPath /pv/data-analytics",
+          "verificationScriptFile": "q12_s2_validate_hostpath.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        }
+      ]
+    }
+  ]
+}

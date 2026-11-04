@@ -1,0 +1,385 @@
+{
+  "questions": [
+    {
+      "id": "1",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "Create a pod named `redis-storage` in the `default` namespace using the image `redis:alpine`.\n\nThe pod must declare a volume named `redis-storage` of type `emptyDir` and mount it at `/data/redis`.",
+      "concepts": [
+        "volumes",
+        "emptyDir",
+        "pods"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Pod redis-storage exists with image redis:alpine",
+          "verificationScriptFile": "q1_s1_validate_pod.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "Volume redis-storage is emptyDir mounted at /data/redis",
+          "verificationScriptFile": "q1_s2_validate_volume.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "3",
+          "description": "Pod redis-storage is Running",
+          "verificationScriptFile": "q1_s3_validate_running.sh",
+          "expectedOutput": "0",
+          "weightage": 1
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "Create a pod named `super-user-pod` in the `default` namespace using the image `busybox:1.28`.\n\n- The container must run the command `sleep 4800`.\n- The container must add the capability `SYS_TIME`.",
+      "concepts": [
+        "security context",
+        "capabilities",
+        "pods"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Pod super-user-pod exists with image busybox:1.28 and command sleep 4800",
+          "verificationScriptFile": "q2_s1_validate_pod.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "2",
+          "description": "Container adds the SYS_TIME capability",
+          "verificationScriptFile": "q2_s2_validate_capability.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "Create a PersistentVolumeClaim named `my-pvc` in the `default` namespace:\n\n- accessMode: `ReadWriteOnce`\n- requested storage: `10Mi`\n\nThen create a pod named `use-pv` using the image `nginx` that mounts this claim at `/data`.",
+      "concepts": [
+        "persistentvolumeclaims",
+        "storage",
+        "volumes"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "PersistentVolumeClaim my-pvc exists (ReadWriteOnce, 10Mi) and is Bound",
+          "verificationScriptFile": "q3_s1_validate_pvc.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "2",
+          "description": "Pod use-pv mounts claim my-pvc at /data",
+          "verificationScriptFile": "q3_s2_validate_mount.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "3",
+          "description": "Pod use-pv is Running",
+          "verificationScriptFile": "q3_s3_validate_running.sh",
+          "expectedOutput": "0",
+          "weightage": 1
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "Create a deployment named `nginx-deploy` in the `default` namespace with `1` replica using the image `nginx:1.16`.\n\nThen upgrade it to image `nginx:1.17` using a rolling update so that the rollout history records the change.",
+      "concepts": [
+        "deployments",
+        "rolling updates",
+        "kubectl set image"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Deployment nginx-deploy exists with 1 replica and image nginx:1.17",
+          "verificationScriptFile": "q4_s1_validate_image.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "2",
+          "description": "Rollout history records at least 2 revisions",
+          "verificationScriptFile": "q4_s2_validate_history.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "3",
+          "description": "All nginx-deploy pods run image nginx:1.17",
+          "verificationScriptFile": "q4_s3_validate_pods.sh",
+          "expectedOutput": "0",
+          "weightage": 1
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "Set up DNS troubleshooting:\n\n1. Create a pod named `nginx-resolver` using the image `nginx`.\n2. Expose it with a service named `nginx-resolver-service` on port `80` (ClusterIP).\n3. Run `nslookup` against the **service** name and save the output to `/tmp/exam/nginx.svc` on `ckad9999`.\n4. Run `nslookup` against the **pod IP** and save the output to `/tmp/exam/nginx.pod` on `ckad9999`.\n\nBoth files must contain the resolved IP address.",
+      "concepts": [
+        "dns",
+        "services",
+        "nslookup"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Pod nginx-resolver and service nginx-resolver-service exist with endpoints",
+          "verificationScriptFile": "q5_s1_validate_service.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "/tmp/exam/nginx.svc contains the service ClusterIP",
+          "verificationScriptFile": "q5_s2_validate_svc_file.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "3",
+          "description": "/tmp/exam/nginx.pod contains the pod IP",
+          "verificationScriptFile": "q5_s3_validate_pod_file.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        }
+      ]
+    },
+    {
+      "id": "6",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "A pod called `pvviewer` must be able to list PersistentVolumes:\n\n1. Create a ServiceAccount named `pvviewer` in `default`.\n2. Create a ClusterRole named `pvviewer-role` that allows `list` on `persistentvolumes`.\n3. Create a ClusterRoleBinding named `pvviewer-role-binding` binding that role to the ServiceAccount.\n4. Create a pod named `pvviewer` using the image `redis` that runs under the `pvviewer` ServiceAccount.",
+      "concepts": [
+        "rbac",
+        "serviceaccounts",
+        "clusterroles"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "ServiceAccount, ClusterRole and ClusterRoleBinding exist with correct rules",
+          "verificationScriptFile": "q6_s1_validate_rbac.sh",
+          "expectedOutput": "0",
+          "weightage": 5
+        },
+        {
+          "id": "2",
+          "description": "Pod pvviewer runs under the pvviewer ServiceAccount",
+          "verificationScriptFile": "q6_s2_validate_pod.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "3",
+          "description": "The ServiceAccount can list persistentvolumes",
+          "verificationScriptFile": "q6_s3_validate_auth.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        }
+      ]
+    },
+    {
+      "id": "7",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "Write the `InternalIP` of every node in the cluster, space-separated on a single line, to the file `/tmp/exam/node_ips` on `ckad9999`.",
+      "concepts": [
+        "kubectl",
+        "jsonpath",
+        "cluster-basics"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "File /tmp/exam/node_ips exists and is not empty",
+          "verificationScriptFile": "q7_s1_validate_file.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "2",
+          "description": "The file contains the InternalIP of every node",
+          "verificationScriptFile": "q7_s2_validate_ips.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        }
+      ]
+    },
+    {
+      "id": "8",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "Create a pod named `multi-pod` in the `default` namespace with two containers:\n\n- `alpha`: image `nginx`, environment variable `name=alpha`\n- `beta`: image `busybox`, command `sleep 4800`, environment variable `name=beta`",
+      "concepts": [
+        "multi-container pods",
+        "environment variables",
+        "pods"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Pod multi-pod exists with containers alpha and beta",
+          "verificationScriptFile": "q8_s1_validate_containers.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "Environment variables name=alpha and name=beta are set correctly",
+          "verificationScriptFile": "q8_s2_validate_env.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "3",
+          "description": "Pod multi-pod is Running",
+          "verificationScriptFile": "q8_s3_validate_running.sh",
+          "expectedOutput": "0",
+          "weightage": 1
+        }
+      ]
+    },
+    {
+      "id": "9",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "Create a pod named `non-root-pod` in the `default` namespace using the image `redis:alpine`.\n\nThe pod-level security context must set `runAsUser: 1000` and `fsGroup: 2000`.",
+      "concepts": [
+        "pod security",
+        "runAsUser",
+        "fsGroup"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Pod non-root-pod exists with image redis:alpine",
+          "verificationScriptFile": "q9_s1_validate_pod.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "2",
+          "description": "Pod securityContext sets runAsUser 1000 and fsGroup 2000",
+          "verificationScriptFile": "q9_s2_validate_security.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "3",
+          "description": "Pod non-root-pod is Running",
+          "verificationScriptFile": "q9_s3_validate_running.sh",
+          "expectedOutput": "0",
+          "weightage": 1
+        }
+      ]
+    },
+    {
+      "id": "10",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "The pod `np-test-1` (already running, label `run=np-test-1`) must only accept ingress traffic on port `80`.\n\nCreate a NetworkPolicy named `ingress-to-nptest` in the `default` namespace that:\n\n- selects pods with label `run=np-test-1`\n- declares policy type `Ingress`\n- allows ingress on TCP port `80`",
+      "concepts": [
+        "networkpolicies",
+        "networking",
+        "security"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "NetworkPolicy ingress-to-nptest selects run=np-test-1 and declares policy type Ingress",
+          "verificationScriptFile": "q10_s1_validate_policy.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "2",
+          "description": "Ingress rule allows TCP port 80",
+          "verificationScriptFile": "q10_s2_validate_rule.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        }
+      ]
+    },
+    {
+      "id": "11",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "Node `k3d-cluster-agent-1` is reserved for production workloads:\n\n1. Taint the node with `env_type=production:NoSchedule`.\n2. Create a pod named `dev-redis` using image `redis:alpine` - it must **not** be scheduled on `k3d-cluster-agent-1`.\n3. Create a pod named `prod-redis` using image `redis:alpine` **with** a toleration for that taint **and** a nodeSelector pinning it to `k3d-cluster-agent-1`.",
+      "concepts": [
+        "taints",
+        "tolerations",
+        "nodeSelector",
+        "scheduling"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Node k3d-cluster-agent-1 has taint env_type=production:NoSchedule",
+          "verificationScriptFile": "q11_s1_validate_taint.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "Pod dev-redis exists and is NOT scheduled on k3d-cluster-agent-1",
+          "verificationScriptFile": "q11_s2_validate_dev.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "3",
+          "description": "Pod prod-redis has the toleration and runs on k3d-cluster-agent-1",
+          "verificationScriptFile": "q11_s3_validate_prod.sh",
+          "expectedOutput": "0",
+          "weightage": 5
+        }
+      ]
+    },
+    {
+      "id": "12",
+      "namespace": "default",
+      "machineHostname": "ckad9999",
+      "question": "A kubeconfig file called `super.kubeconfig` exists at `/tmp/exam/super.kubeconfig` on `ckad9999`, but it is broken - it points at the wrong API server port.\n\nTroubleshoot and fix it so that:\n\n```bash\nkubectl --kubeconfig=/tmp/exam/super.kubeconfig get nodes\n```\n\nworks. Compare it with the working kubeconfig at `/home/candidate/.kube/kubeconfig` if you need a reference.",
+      "concepts": [
+        "kubeconfig",
+        "troubleshooting",
+        "certificates"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "super.kubeconfig points at port 6443 (no port 2379 left)",
+          "verificationScriptFile": "q12_s1_validate_port.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "kubectl --kubeconfig=/tmp/exam/super.kubeconfig get nodes succeeds",
+          "verificationScriptFile": "q12_s2_validate_kubectl.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        }
+      ]
+    }
+  ]
+}

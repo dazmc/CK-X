@@ -81,6 +81,26 @@
         "examDurationInMinutes": 90
       },
       {
+        "id": "cka-004",
+        "assetPath": "assets/exams/cka/004",
+        "name": "CKA Mock Exam 1 (KodeKloud)",
+        "category": "CKA",
+        "description": "12-question mock adapted from Mock Exam 1 of the free KodeKloud CKA course notes (github.com/kodekloudhub/certified-kubernetes-administrator-course, credited to KodeKloud): pod creation with labels, namespaces, JSON/JSONPath node exports, services and selectors, deployments, static pods, troubleshooting a broken container command, NodePort services, and a hostPath PersistentVolume.",
+        "warmUpTimeInSeconds": 260,
+        "difficulty": "Medium",
+        "examDurationInMinutes": 90
+      },
+      {
+        "id": "cka-005",
+        "assetPath": "assets/exams/cka/005",
+        "name": "CKA Mock Exams 2 & 3 (KodeKloud)",
+        "category": "CKA",
+        "description": "12-question mock adapted from Mock Exams 2 and 3 of the free KodeKloud CKA course notes (github.com/kodekloudhub/certified-kubernetes-administrator-course, credited to KodeKloud): emptyDir volumes, capabilities, PVC binding, rolling updates, DNS nslookup tasks, RBAC, multi-container pods, pod security context, NetworkPolicies, taints/tolerations/nodeSelector, and kubeconfig troubleshooting.",
+        "warmUpTimeInSeconds": 260,
+        "difficulty": "Hard",
+        "examDurationInMinutes": 90
+      },
+      {
         "id": "cka-001",
         "assetPath": "assets/exams/cka/001",
         "name": "CKA Practice Lab - Core Concepts",
