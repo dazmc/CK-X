@@ -1,164 +1,174 @@
 {
-    "labs": [
-      {
-        "id": "ckad-001",
-        "assetPath": "assets/exams/ckad/001",
-        "name": "CKAD Comprehensive Lab - 1",
-        "category": "CKAD",
-        "description": "Hands-on exercises covering core Kubernetes concepts, pod configuration, deployments, and services with practical tasks for application deployment in a cluster.",
-        "warmUpTimeInSeconds": 260,
-         "difficulty": "Medium",
-         "examDurationInMinutes": 120
-      },
-      {
-        "id": "ckad-002",
-        "assetPath": "assets/exams/ckad/002",
-        "name": "CKAD Comprehensive Lab - 2",
-        "category": "CKAD",
-        "description": "Series of practical tasks on multi-container pods, pod design patterns, configuration, services, and networking in Kubernetes environments.",
-        "warmUpTimeInSeconds": 260,
-        "difficulty": "Hard",
-        "examDurationInMinutes": 120
-      },
-      {
-        "id": "ckad-003",
-        "assetPath": "assets/exams/ckad/003",
-        "name": "CKAD Lightning Lab - KodeKloud Mock",
-        "category": "CKAD",
-        "description": "Hands-on CKAD tasks adapted from KodeKloud's Lightning Labs 1 and 2 (credited to KodeKloud): PV/PVC binding, NetworkPolicies, ConfigMap-driven pods, deployment rollout and rollback, resource requests and volumes, probe troubleshooting, CronJobs, secret volume mounts, ingress routing, and log filtering.",
-        "warmUpTimeInSeconds": 260,
-        "difficulty": "Medium",
-        "examDurationInMinutes": 120
-      },
-      {
-        "id": "ckad-004",
-        "assetPath": "assets/exams/ckad/004",
-        "name": "CKAD Practice Lab - spudale Prep",
-        "category": "CKAD",
-        "description": "Ten CKAD tasks adapted from the spudale/ckad-exam-preparation labs (credited to spudale): Secret-backed env vars, rollout strategy and rollback, LimitRange inspection, deprecated API migration, container renaming, CronJobs with history limits, canary deployments, security contexts, ServiceAccount/RBAC diagnosis, and Service/Ingress troubleshooting.",
-        "warmUpTimeInSeconds": 260,
-        "difficulty": "Hard",
-        "examDurationInMinutes": 120
-      },
-      {
-        "id": "cks-001",
-        "assetPath": "assets/exams/cks/001",
-        "name": "CKS Practice Lab - Kubernetes Security Essentials",
-        "category": "CKS",
-        "description": "Practice essential Kubernetes security concepts including network policies, RBAC, supply chain security, and runtime protection",
-        "warmUpTimeInSeconds": 260,
-        "difficulty": "Hard",
-        "examDurationInMinutes": 120
-      },
-      {
-        "id": "cks-002",
-        "assetPath": "assets/exams/cks/002",
-        "name": "CKS Mock Exam Practice - KodeKloud Mocks 1-3",
-        "category": "CKS",
-        "description": "Kubernetes security tasks adapted from KodeKloud's CKS Mock Exams 1-3 (credited to KodeKloud): secret extraction and read-only mounting, ingress-restricting NetworkPolicies, service account token unmounting, least-privilege RBAC, immutability triage, and RuntimeClass sandboxing.",
-        "warmUpTimeInSeconds": 260,
-        "difficulty": "Hard",
-        "examDurationInMinutes": 120
-      },
-      {
-        "id": "kcsa-001",
-        "assetPath": "assets/exams/kcsa/001",
-        "name": "KCSA Mock Exam - Kubernetes & Cloud Security Associate",
-        "category": "KCSA",
-        "description": "60-question multiple-choice mock exam matching the official KCSA blueprint: 90 minutes, 75% pass mark, weighted across Overview of Cloud Native Security (14%), Kubernetes Cluster Component Security (22%), Kubernetes Security Fundamentals (22%), Kubernetes Threat Model (16%), Platform Security (16%), and Compliance and Security Frameworks (10%). Every answer is graded instantly with an explanation and a domain-wise performance breakdown.",
-        "warmUpTimeInSeconds": 10,
-        "difficulty": "Easy",
-        "examDurationInMinutes": 90
-      },
-      {
-        "id": "kcna-001",
-        "assetPath": "assets/exams/kcna/001",
-        "name": "KCNA Mock Exam - Kubernetes & Cloud Native Associate",
-        "category": "KCNA",
-        "description": "60-question multiple-choice mock exam matching the official KCNA blueprint: 90 minutes, 75% pass mark, weighted across Kubernetes Fundamentals (44%), Container Orchestration (28%), Cloud Native Application Delivery (16%), and Cloud Native Architecture (12%). Every answer is graded instantly with an explanation and a domain-wise performance breakdown.",
-        "warmUpTimeInSeconds": 10,
-        "difficulty": "Easy",
-        "examDurationInMinutes": 90
-      },
-      {
-        "id": "playground-001",
-        "assetPath": "assets/exams/playground/001",
-        "name": "Playground - Kubernetes Sandpit",
-        "category": "Playground",
-        "description": "A question-free 2-hour sandbox on a real 2-worker Kubernetes cluster. Experiment freely with kubectl, taints, DaemonSets, networking, storage - whatever you like. The session hard-stops at 0:00 and the cluster is deleted automatically.",
-        "warmUpTimeInSeconds": 260,
-        "difficulty": "Easy",
-        "examDurationInMinutes": 120
-      },
-      {
-        "id": "cka-002",
-        "assetPath": "assets/exams/cka/002",
-        "name": "CKA Practice Lab - Advanced Administration",
-        "category": "CKA",
-        "description": "Comprehensive lab covering advanced Kubernetes administration topics including storage, networking, security, and troubleshooting with focus on real-world scenarios, updated with the latest CKA exam curriculum changes.",
-        "warmUpTimeInSeconds": 360,
-        "difficulty": "Hard",
-        "examDurationInMinutes": 120
-      },
-      {
-        "id": "cka-003",
-        "assetPath": "assets/exams/cka/003",
-        "name": "CKA Practice Lab - Troubleshooting & Maintenance",
-        "category": "CKA",
-        "description": "16-question lab progressing from simple to hard, focused on CKA curriculum gaps: kubectl output tasks, node scheduling, Jobs, CSR approval, PVC expansion, service and network policy debugging, kubectl debug with ephemeral containers, deprecated API conversion, RBAC 403 troubleshooting, topology spread, multi-fault repair, and node maintenance recovery.",
-        "warmUpTimeInSeconds": 260,
-        "difficulty": "Medium",
-        "examDurationInMinutes": 90
-      },
-      {
-        "id": "cka-004",
-        "assetPath": "assets/exams/cka/004",
-        "name": "CKA Mock Exam 1 (KodeKloud)",
-        "category": "CKA",
-        "description": "12-question mock adapted from Mock Exam 1 of the free KodeKloud CKA course notes (github.com/kodekloudhub/certified-kubernetes-administrator-course, credited to KodeKloud): pod creation with labels, namespaces, JSON/JSONPath node exports, services and selectors, deployments, static pods, troubleshooting a broken container command, NodePort services, and a hostPath PersistentVolume.",
-        "warmUpTimeInSeconds": 260,
-        "difficulty": "Medium",
-        "examDurationInMinutes": 90
-      },
-      {
-        "id": "cka-005",
-        "assetPath": "assets/exams/cka/005",
-        "name": "CKA Mock Exams 2 & 3 (KodeKloud)",
-        "category": "CKA",
-        "description": "12-question mock adapted from Mock Exams 2 and 3 of the free KodeKloud CKA course notes (github.com/kodekloudhub/certified-kubernetes-administrator-course, credited to KodeKloud): emptyDir volumes, capabilities, PVC binding, rolling updates, DNS nslookup tasks, RBAC, multi-container pods, pod security context, NetworkPolicies, taints/tolerations/nodeSelector, and kubeconfig troubleshooting.",
-        "warmUpTimeInSeconds": 260,
-        "difficulty": "Hard",
-        "examDurationInMinutes": 90
-      },
-      {
-        "id": "cka-001",
-        "assetPath": "assets/exams/cka/001",
-        "name": "CKA Practice Lab - Core Concepts",
-        "category": "CKA",
-        "description": "Practice essential Kubernetes administrator tasks covering cluster management, networking, storage, and security",
-        "warmUpTimeInSeconds": 260,
-        "difficulty": "Easy",
-        "examDurationInMinutes": 60
-      },
-      {
-        "id": "docker-001",
-        "assetPath": "assets/exams/other/001",
-        "name": "Docker Speed Run - Core Concepts",
-        "category": "Other",
-        "description": "Fast-paced practice lab covering Docker fundamentals including images, containers, volumes, networking, OCI, logging, and security best practices.",
-        "warmUpTimeInSeconds": 120,
-        "difficulty": "Medium",
-        "examDurationInMinutes": 90
-      },
-      {
-        "id": "helm-001",
-        "assetPath": "assets/exams/other/002",
-        "name": "Helm Fundamentals Lab",
-        "category": "Other",
-        "description": "Comprehensive lab covering Helm basics including chart installation, repositories, customization, packaging, debugging, and advanced Helm operations for Kubernetes applications.",
-        "warmUpTimeInSeconds": 260,
-        "difficulty": "Medium",
-        "examDurationInMinutes": 90
-      }
-    ]
-  } 
+  "labs": [
+    {
+      "id": "ckad-001",
+      "assetPath": "assets/exams/ckad/001",
+      "name": "CKAD Comprehensive Lab - 1",
+      "category": "CKAD",
+      "description": "Hands-on exercises covering core Kubernetes concepts, pod configuration, deployments, and services with practical tasks for application deployment in a cluster.",
+      "warmUpTimeInSeconds": 260,
+      "difficulty": "Medium",
+      "examDurationInMinutes": 120
+    },
+    {
+      "id": "ckad-002",
+      "assetPath": "assets/exams/ckad/002",
+      "name": "CKAD Comprehensive Lab - 2",
+      "category": "CKAD",
+      "description": "Series of practical tasks on multi-container pods, pod design patterns, configuration, services, and networking in Kubernetes environments.",
+      "warmUpTimeInSeconds": 260,
+      "difficulty": "Hard",
+      "examDurationInMinutes": 120
+    },
+    {
+      "id": "ckad-003",
+      "assetPath": "assets/exams/ckad/003",
+      "name": "CKAD Lightning Lab - KodeKloud Mock",
+      "category": "CKAD",
+      "description": "Hands-on CKAD tasks adapted from KodeKloud's Lightning Labs 1 and 2 (credited to KodeKloud): PV/PVC binding, NetworkPolicies, ConfigMap-driven pods, deployment rollout and rollback, resource requests and volumes, probe troubleshooting, CronJobs, secret volume mounts, ingress routing, and log filtering.",
+      "warmUpTimeInSeconds": 260,
+      "difficulty": "Medium",
+      "examDurationInMinutes": 120
+    },
+    {
+      "id": "ckad-004",
+      "assetPath": "assets/exams/ckad/004",
+      "name": "CKAD Practice Lab - spudale Prep",
+      "category": "CKAD",
+      "description": "Ten CKAD tasks adapted from the spudale/ckad-exam-preparation labs (credited to spudale): Secret-backed env vars, rollout strategy and rollback, LimitRange inspection, deprecated API migration, container renaming, CronJobs with history limits, canary deployments, security contexts, ServiceAccount/RBAC diagnosis, and Service/Ingress troubleshooting.",
+      "warmUpTimeInSeconds": 260,
+      "difficulty": "Hard",
+      "examDurationInMinutes": 120
+    },
+    {
+      "id": "cks-001",
+      "assetPath": "assets/exams/cks/001",
+      "name": "CKS Practice Lab - Kubernetes Security Essentials",
+      "category": "CKS",
+      "description": "Practice essential Kubernetes security concepts including network policies, RBAC, supply chain security, and runtime protection",
+      "warmUpTimeInSeconds": 260,
+      "difficulty": "Hard",
+      "examDurationInMinutes": 120
+    },
+    {
+      "id": "cks-002",
+      "assetPath": "assets/exams/cks/002",
+      "name": "CKS Mock Exam Practice - KodeKloud Mocks 1-3",
+      "category": "CKS",
+      "description": "Kubernetes security tasks adapted from KodeKloud's CKS Mock Exams 1-3 (credited to KodeKloud): secret extraction and read-only mounting, ingress-restricting NetworkPolicies, service account token unmounting, least-privilege RBAC, immutability triage, and RuntimeClass sandboxing.",
+      "warmUpTimeInSeconds": 260,
+      "difficulty": "Hard",
+      "examDurationInMinutes": 120
+    },
+    {
+      "id": "kcsa-001",
+      "assetPath": "assets/exams/kcsa/001",
+      "name": "KCSA Mock Exam - Kubernetes & Cloud Security Associate",
+      "category": "KCSA",
+      "description": "60-question multiple-choice mock exam matching the official KCSA blueprint: 90 minutes, 75% pass mark, weighted across Overview of Cloud Native Security (14%), Kubernetes Cluster Component Security (22%), Kubernetes Security Fundamentals (22%), Kubernetes Threat Model (16%), Platform Security (16%), and Compliance and Security Frameworks (10%). Every answer is graded instantly with an explanation and a domain-wise performance breakdown.",
+      "warmUpTimeInSeconds": 10,
+      "difficulty": "Easy",
+      "examDurationInMinutes": 90
+    },
+    {
+      "id": "kcna-001",
+      "assetPath": "assets/exams/kcna/001",
+      "name": "KCNA Mock Exam - Kubernetes & Cloud Native Associate",
+      "category": "KCNA",
+      "description": "60-question multiple-choice mock exam matching the official KCNA blueprint: 90 minutes, 75% pass mark, weighted across Kubernetes Fundamentals (44%), Container Orchestration (28%), Cloud Native Application Delivery (16%), and Cloud Native Architecture (12%). Every answer is graded instantly with an explanation and a domain-wise performance breakdown.",
+      "warmUpTimeInSeconds": 10,
+      "difficulty": "Easy",
+      "examDurationInMinutes": 90
+    },
+    {
+      "id": "playground-001",
+      "assetPath": "assets/exams/playground/001",
+      "name": "Playground - Kubernetes Sandpit",
+      "category": "Playground",
+      "description": "A question-free 2-hour sandbox on a real 2-worker Kubernetes cluster. Experiment freely with kubectl, taints, DaemonSets, networking, storage - whatever you like. The session hard-stops at 0:00 and the cluster is deleted automatically.",
+      "warmUpTimeInSeconds": 260,
+      "difficulty": "Easy",
+      "examDurationInMinutes": 120
+    },
+    {
+      "id": "cka-002",
+      "assetPath": "assets/exams/cka/002",
+      "name": "CKA Practice Lab - Advanced Administration",
+      "category": "CKA",
+      "description": "Comprehensive lab covering advanced Kubernetes administration topics including storage, networking, security, and troubleshooting with focus on real-world scenarios, updated with the latest CKA exam curriculum changes.",
+      "warmUpTimeInSeconds": 360,
+      "difficulty": "Hard",
+      "examDurationInMinutes": 120
+    },
+    {
+      "id": "cka-003",
+      "assetPath": "assets/exams/cka/003",
+      "name": "CKA Practice Lab - Troubleshooting & Maintenance",
+      "category": "CKA",
+      "description": "16-question lab progressing from simple to hard, focused on CKA curriculum gaps: kubectl output tasks, node scheduling, Jobs, CSR approval, PVC expansion, service and network policy debugging, kubectl debug with ephemeral containers, deprecated API conversion, RBAC 403 troubleshooting, topology spread, multi-fault repair, and node maintenance recovery.",
+      "warmUpTimeInSeconds": 260,
+      "difficulty": "Medium",
+      "examDurationInMinutes": 90
+    },
+    {
+      "id": "cka-004",
+      "assetPath": "assets/exams/cka/004",
+      "name": "CKA Mock Exam 1 (KodeKloud)",
+      "category": "CKA",
+      "description": "12-question mock adapted from Mock Exam 1 of the free KodeKloud CKA course notes (github.com/kodekloudhub/certified-kubernetes-administrator-course, credited to KodeKloud): pod creation with labels, namespaces, JSON/JSONPath node exports, services and selectors, deployments, static pods, troubleshooting a broken container command, NodePort services, and a hostPath PersistentVolume.",
+      "warmUpTimeInSeconds": 260,
+      "difficulty": "Medium",
+      "examDurationInMinutes": 90
+    },
+    {
+      "id": "cka-005",
+      "assetPath": "assets/exams/cka/005",
+      "name": "CKA Mock Exams 2 & 3 (KodeKloud)",
+      "category": "CKA",
+      "description": "12-question mock adapted from Mock Exams 2 and 3 of the free KodeKloud CKA course notes (github.com/kodekloudhub/certified-kubernetes-administrator-course, credited to KodeKloud): emptyDir volumes, capabilities, PVC binding, rolling updates, DNS nslookup tasks, RBAC, multi-container pods, pod security context, NetworkPolicies, taints/tolerations/nodeSelector, and kubeconfig troubleshooting.",
+      "warmUpTimeInSeconds": 260,
+      "difficulty": "Hard",
+      "examDurationInMinutes": 90
+    },
+    {
+      "id": "cka-006",
+      "assetPath": "assets/exams/cka/006",
+      "name": "CKA Practice Lab - theplatformlab Prep",
+      "category": "CKA",
+      "description": "10-question lab adapted from the MIT-licensed theplatformlab/CKA-Certified-Kubernetes-Administrator exercises and Mock Exam 01 (credited to theplatformlab): RBAC with subresources, native sidecar containers, Ingress with TLS, resource tuning under a ResourceQuota, WaitForFirstConsumer storage, node cordon/drain, rollout strategy with change-cause annotations, CronJobs, CrashLoopBackOff config repair, and Job completions.",
+      "warmUpTimeInSeconds": 260,
+      "difficulty": "Hard",
+      "examDurationInMinutes": 90
+    },
+    {
+      "id": "cka-001",
+      "assetPath": "assets/exams/cka/001",
+      "name": "CKA Practice Lab - Core Concepts",
+      "category": "CKA",
+      "description": "Practice essential Kubernetes administrator tasks covering cluster management, networking, storage, and security",
+      "warmUpTimeInSeconds": 260,
+      "difficulty": "Easy",
+      "examDurationInMinutes": 60
+    },
+    {
+      "id": "docker-001",
+      "assetPath": "assets/exams/other/001",
+      "name": "Docker Speed Run - Core Concepts",
+      "category": "Other",
+      "description": "Fast-paced practice lab covering Docker fundamentals including images, containers, volumes, networking, OCI, logging, and security best practices.",
+      "warmUpTimeInSeconds": 120,
+      "difficulty": "Medium",
+      "examDurationInMinutes": 90
+    },
+    {
+      "id": "helm-001",
+      "assetPath": "assets/exams/other/002",
+      "name": "Helm Fundamentals Lab",
+      "category": "Other",
+      "description": "Comprehensive lab covering Helm basics including chart installation, repositories, customization, packaging, debugging, and advanced Helm operations for Kubernetes applications.",
+      "warmUpTimeInSeconds": 260,
+      "difficulty": "Medium",
+      "examDurationInMinutes": 90
+    }
+  ]
+}

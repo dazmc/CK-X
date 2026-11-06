@@ -1,0 +1,397 @@
+{
+  "questions": [
+    {
+      "id": "1",
+      "namespace": "rbac-ex04",
+      "machineHostname": "ckad9999",
+      "question": "In namespace `rbac-ex04`:\n\n1. Create a ServiceAccount named `dev-sa`.\n2. Create a Role named `pod-manager` that grants:\n   - `get`, `list`, `watch`, `create`, `delete` on `pods`\n   - `get`, `list` on `services`\n   - `patch` on the `deployments/scale` **subresource** (API group `apps`)\n3. Create a RoleBinding named `dev-pod-access` that binds Role `pod-manager` to ServiceAccount `dev-sa`.\n4. Create a ClusterRole named `node-viewer` granting `get`, `list` on `nodes`, and a ClusterRoleBinding named `dev-node-access` binding it to `dev-sa`.\n\nYou can verify the result with `kubectl auth can-i <verb> <resource> -n rbac-ex04 --as=system:serviceaccount:rbac-ex04:dev-sa` (for the scale subresource: `kubectl auth can-i patch deployments --subresource=scale ...`). The ServiceAccount must NOT gain any permissions outside the `rbac-ex04` namespace (listing nodes cluster-wide is the only exception).",
+      "concepts": [
+        "rbac",
+        "roles",
+        "rolebindings",
+        "serviceaccounts",
+        "subresources",
+        "clusterroles"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "ServiceAccount dev-sa can list pods in rbac-ex04",
+          "verificationScriptFile": "q1_s1_validate_can_list_pods.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "ServiceAccount dev-sa can patch the deployments/scale subresource",
+          "verificationScriptFile": "q1_s2_validate_scale_perm.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "3",
+          "description": "dev-sa cannot delete deployments and cannot list pods outside rbac-ex04",
+          "verificationScriptFile": "q1_s3_validate_scoped.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "4",
+          "description": "dev-sa can list nodes via the ClusterRole and ClusterRoleBinding",
+          "verificationScriptFile": "q1_s4_validate_nodes.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "namespace": "sidecar-ex02",
+      "machineHostname": "ckad9999",
+      "question": "In namespace `sidecar-ex02`, create a Deployment named `logger` with **1 replica** and label `app=logger` that uses the native sidecar pattern:\n\n1. Main container `app` (image `busybox:1.36`) that appends a line to `/var/log/app/app.log` every 3 seconds:\n`sh -c 'while true; do echo \"$(date) - app running\" >> /var/log/app/app.log; sleep 3; done'`\n2. An **init container** named `log-agent` (image `busybox:1.36`) with `restartPolicy: Always` - that is what makes it a native sidecar - running `sh -c 'tail -F /var/log/app/app.log'`\n3. Both containers must mount the same `emptyDir` volume named `log-volume` at `/var/log/app`.\n\nWait until the Pod is Ready with both containers running so the sidecar streams the application log.",
+      "concepts": [
+        "native sidecar",
+        "init containers",
+        "restartPolicy",
+        "emptyDir",
+        "shared volumes"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Pod template has init container log-agent with restartPolicy Always and image busybox:1.36",
+          "verificationScriptFile": "q2_s1_validate_sidecar.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "2",
+          "description": "EmptyDir volume log-volume is mounted at /var/log/app in both containers",
+          "verificationScriptFile": "q2_s2_validate_volumes.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "3",
+          "description": "Deployment is Ready and the log-agent sidecar container is running",
+          "verificationScriptFile": "q2_s3_validate_running.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "namespace": "ingress-ex19",
+      "machineHostname": "ckad9999",
+      "question": "In namespace `ingress-ex19` two Services already exist: `web-service` (port `80`) and `api-service` (port `8080`), backed by the Deployments `web-app` and `api-app`. A TLS Secret named `api-tls-cert` has also been created.\n\nCreate a single Ingress named `web-ingress` in `ingress-ex19`:\n\n1. Set `ingressClassName` to `nginx`.\n2. Terminate TLS for host `api.example.com` using the Secret `api-tls-cert`.\n3. Rule for host `web.example.com`: path `/` (type `Prefix`) routed to Service `web-service` port `80`.\n4. Rule for host `api.example.com`: path `/api` (type `Prefix`) routed to Service `api-service` port `8080`.",
+      "concepts": [
+        "ingress",
+        "ingressClassName",
+        "TLS",
+        "host-based routing",
+        "path routing"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Ingress web-ingress exists with ingressClassName nginx",
+          "verificationScriptFile": "q3_s1_validate_ingress.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "TLS section uses secret api-tls-cert for host api.example.com",
+          "verificationScriptFile": "q3_s2_validate_tls.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "3",
+          "description": "web.example.com / (Prefix) routes to web-service:80",
+          "verificationScriptFile": "q3_s3_validate_web_rule.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "4",
+          "description": "api.example.com /api (Prefix) routes to api-service:8080",
+          "verificationScriptFile": "q3_s4_validate_api_rule.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "namespace": "resource-tuning",
+      "machineHostname": "ckad9999",
+      "question": "In namespace `resource-tuning` a ResourceQuota named `compute-quota` limits total container requests to `1` CPU and `2Gi` memory (and at most 10 pods).\n\nThe Deployment `web` (3 replicas, image `nginx:1.27`, label `app=web`) declares requests of `1200m` CPU and `1Gi` memory per container - even a single pod asks for more CPU than the whole quota allows, so the ReplicaSet cannot create any pods and the API rejects them with `exceeded quota: compute-quota` (check the ReplicaSet events).\n\nFix the Deployment so all 3 replicas run:\n\n1. Keep declaring both `requests.cpu` and `requests.memory` on the container - do not remove them, and do not delete or edit the ResourceQuota.\n2. Lower the per-container requests so that the total for 3 replicas fits within the quota.\n3. Wait until all 3 pods are Running.",
+      "concepts": [
+        "resource quotas",
+        "resource requests",
+        "scheduling",
+        "troubleshooting"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Deployment web runs exactly 3 ready replicas",
+          "verificationScriptFile": "q4_s1_validate_pods.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "2",
+          "description": "Every container still declares positive requests.cpu and requests.memory",
+          "verificationScriptFile": "q4_s2_validate_requests.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "3",
+          "description": "Total requests of the 3 pods fit within the quota (<= 1000m CPU and <= 2Gi memory)",
+          "verificationScriptFile": "q4_s3_validate_quota_fit.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "4",
+          "description": "ResourceQuota compute-quota is unchanged (requests.cpu=1, requests.memory=2Gi, pods=10)",
+          "verificationScriptFile": "q4_s4_validate_quota.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "namespace": "wffc-ex25",
+      "machineHostname": "ckad9999",
+      "question": "In namespace `wffc-ex25`:\n\n1. Create a StorageClass named `local-wffc` with provisioner `rancher.io/local-path` and `volumeBindingMode: WaitForFirstConsumer`.\n2. Create a PersistentVolumeClaim named `local-pvc` (1Gi, `ReadWriteOnce`, storageClassName `local-wffc`). It will stay `Pending` - that is expected until a Pod consumes it.\n3. Create a Deployment named `app` (1 replica, image `busybox:1.36`, command `sleep 3600`, label `app=app`) that mounts `local-pvc` at `/data`.\n\nOnce the Pod is scheduled the claim should bind and the Pod must run.",
+      "concepts": [
+        "storageclasses",
+        "volume binding mode",
+        "WaitForFirstConsumer",
+        "persistentvolumeclaims"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "StorageClass local-wffc uses rancher.io/local-path with WaitForFirstConsumer binding",
+          "verificationScriptFile": "q5_s1_validate_sc.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "PVC local-pvc is 1Gi ReadWriteOnce on local-wffc and is Bound",
+          "verificationScriptFile": "q5_s2_validate_pvc.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "3",
+          "description": "Deployment app mounts local-pvc at /data and is Ready",
+          "verificationScriptFile": "q5_s3_validate_pod.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        }
+      ]
+    },
+    {
+      "id": "6",
+      "namespace": "drain-ex08",
+      "machineHostname": "ckad9999",
+      "question": "Node `k3d-cluster-agent-1` needs maintenance.\n\n1. Cordon the node so it is marked `SchedulingDisabled`.\n2. Drain it. The drain must succeed despite DaemonSet-managed pods and pods that hold data on the node's filesystem - use the appropriate `kubectl drain` flags.\n3. Confirm the pods of the Job `drain-marker` in namespace `drain-ex08` (created by the lab setup on that node) have been evicted - no `drain-marker` pods should remain.\n4. Uncordon the node.\n5. Scale the Deployment `drain-demo` in namespace `drain-ex08` from 2 to 4 replicas and confirm the new Pods also land on the now-schedulable `k3d-cluster-agent-1`.",
+      "concepts": [
+        "node drain",
+        "cordon",
+        "uncordon",
+        "pod eviction",
+        "daemonsets",
+        "scaling"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Node k3d-cluster-agent-1 is schedulable (not cordoned)",
+          "verificationScriptFile": "q6_s1_validate_uncordon.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "drain-marker Job pods were evicted (none remain)",
+          "verificationScriptFile": "q6_s2_validate_marker.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "3",
+          "description": "Deployment drain-demo runs 4 ready replicas",
+          "verificationScriptFile": "q6_s3_validate_scale.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "4",
+          "description": "At least one drain-demo pod runs on k3d-cluster-agent-1",
+          "verificationScriptFile": "q6_s4_validate_placement.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        }
+      ]
+    },
+    {
+      "id": "7",
+      "namespace": "rollout-ex06",
+      "machineHostname": "ckad9999",
+      "question": "In namespace `rollout-ex06`:\n\n1. Create a Deployment named `webapp` (3 replicas, image `nginx:1.27`, label `app=webapp`) with strategy `RollingUpdate`, `maxSurge: 1`, `maxUnavailable: 0`.\n2. Record the change cause with the annotation `kubernetes.io/change-cause` = `initial deploy nginx:1.27`.\n3. Update the image to `nginx:1.28` and record change cause `update to nginx:1.28` (the annotation lives on the Deployment object itself, so you will need `--overwrite`).\n4. Wait for the rollout to finish, then roll back to the previous revision so the Deployment runs `nginx:1.27` again.",
+      "concepts": [
+        "deployments",
+        "rolling updates",
+        "rollout history",
+        "rollback",
+        "change-cause annotations"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Strategy is RollingUpdate with maxSurge 1, maxUnavailable 0 and 3 replicas",
+          "verificationScriptFile": "q7_s1_validate_strategy.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "2",
+          "description": "Deployment runs nginx:1.27, rollout history has at least 2 revisions and the intermediate nginx:1.28 ReplicaSet exists",
+          "verificationScriptFile": "q7_s2_validate_rollback.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "3",
+          "description": "Annotation kubernetes.io/change-cause is set on the Deployment",
+          "verificationScriptFile": "q7_s3_validate_changecause.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "4",
+          "description": "All 3 replicas are ready",
+          "verificationScriptFile": "q7_s4_validate_ready.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        }
+      ]
+    },
+    {
+      "id": "8",
+      "namespace": "cron-ex21",
+      "machineHostname": "ckad9999",
+      "question": "In namespace `cron-ex21` create a CronJob named `db-cleanup`:\n\n1. Schedule: `*/5 * * * *`\n2. `concurrencyPolicy: Forbid`\n3. Job template: container name `cleanup`, image `busybox:1.37`, command `sh -c 'echo cleanup; date'`, `backoffLimit: 2`, `restartPolicy: Never`\n4. Trigger it once manually: create a Job named `db-cleanup-manual` from the CronJob (`kubectl create job db-cleanup-manual --from=cronjob/db-cleanup`) and wait for it to complete successfully.",
+      "concepts": [
+        "cronjobs",
+        "schedules",
+        "concurrencyPolicy",
+        "backoffLimit",
+        "manual job creation"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "CronJob db-cleanup has schedule */5 * * * * and concurrencyPolicy Forbid",
+          "verificationScriptFile": "q8_s1_validate_cronjob.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "Job template uses busybox:1.37, backoffLimit 2, restartPolicy Never and the cleanup command",
+          "verificationScriptFile": "q8_s2_validate_jobtemplate.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "3",
+          "description": "Job db-cleanup-manual exists and completed successfully",
+          "verificationScriptFile": "q8_s3_validate_manual.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        }
+      ]
+    },
+    {
+      "id": "9",
+      "namespace": "prod",
+      "machineHostname": "ckad9999",
+      "question": "In namespace `prod` the Deployment `payments-api` is stuck in CrashLoopBackOff. The container (named `app`, image `busybox:1.36`) exits with status 1 because it expects a configuration file at `/etc/app/app.env` that does not exist.\n\nFix it without changing the Deployment's command:\n\n1. Create a ConfigMap named `payments-config` in `prod` with a key `app.env` whose value contains the line `DB_HOST=postgres.prod.svc.cluster.local`.\n2. Mount the ConfigMap into the Deployment at `/etc/app` so the file appears at `/etc/app/app.env`.\n3. Wait until the Pod is Running and Ready.",
+      "concepts": [
+        "crashloopbackoff",
+        "configmaps",
+        "volume mounts",
+        "troubleshooting"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "ConfigMap payments-config contains key app.env with DB_HOST=postgres.prod.svc.cluster.local",
+          "verificationScriptFile": "q9_s1_validate_configmap.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "2",
+          "description": "Deployment mounts the ConfigMap at /etc/app",
+          "verificationScriptFile": "q9_s2_validate_mount.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "3",
+          "description": "Pod is Ready and /etc/app/app.env exists inside the container",
+          "verificationScriptFile": "q9_s3_validate_running.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        }
+      ]
+    },
+    {
+      "id": "10",
+      "namespace": "job-ex21",
+      "machineHostname": "ckad9999",
+      "question": "In namespace `job-ex21` create a Job named `cleanup-job`:\n\n1. Image `busybox:1.37` running the command `echo \"Cleanup complete\"`.\n2. `restartPolicy: Never`\n3. Run it three times successfully: `completions: 3` with `parallelism: 1` (the three runs happen one after another).\n4. Wait until the Job reports 3/3 completions.",
+      "concepts": [
+        "jobs",
+        "completions",
+        "parallelism",
+        "restartPolicy"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Job has completions 3, parallelism 1 and restartPolicy Never",
+          "verificationScriptFile": "q10_s1_validate_job.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "2",
+          "description": "Job completed with 3 successful runs",
+          "verificationScriptFile": "q10_s2_validate_complete.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "3",
+          "description": "Job command echoes 'Cleanup complete'",
+          "verificationScriptFile": "q10_s3_validate_command.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        }
+      ]
+    }
+  ]
+}
