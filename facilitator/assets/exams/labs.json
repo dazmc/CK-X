@@ -31,6 +31,16 @@
         "examDurationInMinutes": 120
       },
       {
+        "id": "ckad-004",
+        "assetPath": "assets/exams/ckad/004",
+        "name": "CKAD Practice Lab - spudale Prep",
+        "category": "CKAD",
+        "description": "Ten CKAD tasks adapted from the spudale/ckad-exam-preparation labs (credited to spudale): Secret-backed env vars, rollout strategy and rollback, LimitRange inspection, deprecated API migration, container renaming, CronJobs with history limits, canary deployments, security contexts, ServiceAccount/RBAC diagnosis, and Service/Ingress troubleshooting.",
+        "warmUpTimeInSeconds": 260,
+        "difficulty": "Hard",
+        "examDurationInMinutes": 120
+      },
+      {
         "id": "cks-001",
         "assetPath": "assets/exams/cks/001",
         "name": "CKS Practice Lab - Kubernetes Security Essentials",

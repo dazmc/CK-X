@@ -1,0 +1,358 @@
+{
+  "questions": [
+    {
+      "id": "1",
+      "namespace": "ckad-secret",
+      "machineHostname": "ckad9999",
+      "question": "The `postgres-client` Deployment in namespace `ckad-secret` has the PostgreSQL database name and password hard-coded as literal environment variable values.\n\n1. Create a Secret called `postgres-credentials` in `ckad-secret` with keys `database` and `password` holding the current hard-coded values (`inventory` and `ckad-password`).\n2. Update the Deployment so `POSTGRES_DB` reads key `database` and `POSTGRES_PASSWORD` reads key `password` from that Secret - no literal values may remain under `env[].value`.\n3. Redeploy so the replacement Pod reaches Ready.",
+      "concepts": [
+        "secrets",
+        "environment variables",
+        "deployments",
+        "configuration"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Secret postgres-credentials exists with database=inventory and password=ckad-password",
+          "verificationScriptFile": "q1_s1_validate_secret.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "2",
+          "description": "Both env vars use secretKeyRef to postgres-credentials with the correct keys and no literal values",
+          "verificationScriptFile": "q1_s2_validate_env.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "3",
+          "description": "Deployment rolled out and the replacement Pod is Ready",
+          "verificationScriptFile": "q1_s3_validate_ready.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "namespace": "ckad-rollout",
+      "machineHostname": "ckad9999",
+      "question": "For Deployment `frontend` in namespace `ckad-rollout`:\n\n1. Configure rolling updates with `maxUnavailable: 1` and `maxSurge: 2`.\n2. Update the container image from `nginx:1.24-alpine` to `nginx:1.25-alpine` and wait for the rollout to complete.\n3. Roll the Deployment back to the previous revision (`nginx:1.24-alpine`).",
+      "concepts": [
+        "deployments",
+        "rolling updates",
+        "rollout",
+        "strategy"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Strategy is RollingUpdate with maxUnavailable=1 and maxSurge=2",
+          "verificationScriptFile": "q2_s1_validate_strategy.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "2",
+          "description": "Rollout history records the image update (at least 2 revisions)",
+          "verificationScriptFile": "q2_s2_validate_history.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "3",
+          "description": "After rollback all 4 replicas run nginx:1.24-alpine and are available",
+          "verificationScriptFile": "q2_s3_validate_rollback.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "namespace": "ckad-pod-cpu",
+      "machineHostname": "ckad9999",
+      "question": "A Pod manifest is provided at `/tmp/exam/pod.yaml` for namespace `ckad-pod-cpu`.\n\n1. Inspect the LimitRange `cpu-constraints` in that namespace and determine the maximum allowed CPU (do not assume the value).\n2. Edit the manifest to set the container's CPU **limit** to half of that maximum, keeping the existing CPU request unchanged.\n3. Create Pod `worker` from the updated file and wait until it is Ready.",
+      "concepts": [
+        "limitranges",
+        "resource limits",
+        "pods",
+        "resources"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Pod worker sets limits.cpu to half the LimitRange maximum (500m)",
+          "verificationScriptFile": "q3_s1_validate_limit.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "2",
+          "description": "Pod worker keeps requests.cpu at 200m",
+          "verificationScriptFile": "q3_s2_validate_request.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "3",
+          "description": "Pod worker is Ready",
+          "verificationScriptFile": "q3_s3_validate_ready.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "namespace": "ckad-api",
+      "machineHostname": "ckad9999",
+      "question": "The manifest `/tmp/exam/deprecated-deployment.yaml` uses an API version that is no longer served by current Kubernetes releases, so it cannot be applied.\n\n1. Update the manifest to a supported API version (`apps/v1`).\n2. Add the required `spec.selector.matchLabels` matching the Pod-template labels.\n3. Deploy it in namespace `ckad-api`; two Pods must become Ready.",
+      "concepts": [
+        "api versions",
+        "deployments",
+        "selectors",
+        "troubleshooting"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Deployment legacy-web exists with selector matchLabels app=legacy-web matching the template labels",
+          "verificationScriptFile": "q4_s1_validate_selector.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "2",
+          "description": "Both replicas are available",
+          "verificationScriptFile": "q4_s2_validate_replicas.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "3",
+          "description": "Pod template uses image nginx:1.25-alpine",
+          "verificationScriptFile": "q4_s3_validate_image.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "namespace": "ckad-container",
+      "machineHostname": "ckad9999",
+      "question": "Update Deployment `api` in namespace `ckad-container`:\n\n1. Rename the container `old-container` to `web-container`.\n2. Set its image to `nginx:1.25-alpine`.\n3. Ensure the rollout completes and the Pod is Ready.\n\nThe Pod template must contain exactly one container.",
+      "concepts": [
+        "deployments",
+        "container updates",
+        "patching"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Pod template contains exactly one container, named web-container",
+          "verificationScriptFile": "q5_s1_validate_name.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "2",
+          "description": "Container image is nginx:1.25-alpine",
+          "verificationScriptFile": "q5_s2_validate_image.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "3",
+          "description": "Rollout completed and the Pod is Ready",
+          "verificationScriptFile": "q5_s3_validate_ready.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        }
+      ]
+    },
+    {
+      "id": "6",
+      "namespace": "ckad-cron",
+      "machineHostname": "ckad9999",
+      "question": "In namespace `ckad-cron` create CronJob `half-hour-report`:\n\n- schedule: every 30 minutes (`*/30 * * * *`)\n- container name `sp`, image `busybox:1.28`, restart policy `Never`\n- command: `/bin/sh -c 'date; echo Hello from the Kubernetes cluster'`\n- `activeDeadlineSeconds: 3` on each Job (`spec.jobTemplate.spec`)\n- retain `3` successful and `1` failed Job (`successfulJobsHistoryLimit` / `failedJobsHistoryLimit`)\n\nThen create a Job called `manual-test` from the CronJob's Job template to run it immediately.",
+      "concepts": [
+        "cronjobs",
+        "jobs",
+        "scheduling"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "CronJob schedule is */30 * * * *",
+          "verificationScriptFile": "q6_s1_validate_schedule.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "Job template uses container sp, busybox:1.28, the required command and restartPolicy Never",
+          "verificationScriptFile": "q6_s2_validate_template.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "3",
+          "description": "activeDeadlineSeconds=3 and history limits 3 successful / 1 failed",
+          "verificationScriptFile": "q6_s3_validate_limits.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "4",
+          "description": "Job manual-test exists in ckad-cron",
+          "verificationScriptFile": "q6_s4_validate_job.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        }
+      ]
+    },
+    {
+      "id": "7",
+      "namespace": "ckad-canary",
+      "machineHostname": "ckad9999",
+      "question": "Namespace `ckad-canary` must hold no more than ten application Pods. Deployment `storefront` runs five Pods with image `nginx:1.24-alpine` and is exposed by Service `storefront` (selector `app: storefront`).\n\n1. Scale `storefront` to eight Pods.\n2. Create a canary Deployment called `storefront-canary` with two Pods using image `nginx:1.25-alpine`.\n3. Both Deployments' Pods must carry label `app: storefront` plus a second label that distinguishes stable from canary (e.g. `track: stable` / `track: canary`), and the canary Deployment's selector must include that second label. The Service must route to all ten Pods - eight stable and two canary endpoints.",
+      "concepts": [
+        "deployments",
+        "labels and selectors",
+        "services",
+        "canary"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Deployment storefront has 8 replicas",
+          "verificationScriptFile": "q7_s1_validate_stable.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "Deployment storefront-canary has 2 replicas with image nginx:1.25-alpine",
+          "verificationScriptFile": "q7_s2_validate_canary.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "3",
+          "description": "Both templates share app=storefront with a distinguishing second label and non-overlapping selectors",
+          "verificationScriptFile": "q7_s3_validate_labels.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "4",
+          "description": "Service storefront has 10 ready endpoints (8 stable + 2 canary)",
+          "verificationScriptFile": "q7_s4_validate_endpoints.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        }
+      ]
+    },
+    {
+      "id": "8",
+      "namespace": "ckad-security",
+      "machineHostname": "ckad9999",
+      "question": "Update Deployment `toolbox` in namespace `ckad-security`. Configure container `toolbox` to:\n\n1. Run as user ID `1000` (`runAsUser`, at container level).\n2. Add the Linux capabilities `NET_ADMIN` and `SYS_TIME`.\n\nThe Deployment must roll out successfully.",
+      "concepts": [
+        "security context",
+        "capabilities",
+        "pods"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Container-level securityContext.runAsUser is 1000",
+          "verificationScriptFile": "q8_s1_validate_user.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "2",
+          "description": "capabilities.add includes NET_ADMIN and SYS_TIME",
+          "verificationScriptFile": "q8_s2_validate_caps.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        }
+      ]
+    },
+    {
+      "id": "9",
+      "namespace": "ckad-rbac",
+      "machineHostname": "ckad9999",
+      "question": "Deployment `inspector` in namespace `ckad-rbac` is running, but its logs contain `Forbidden` errors - the Pod cannot list Pods.\n\n1. Inspect the logs and compare the permissions bound to each ServiceAccount (`default`, `log-reader`, `pod-reader`).\n2. Update **only** the Deployment to use the ServiceAccount that is authorized to list Pods in `ckad-rbac`.\n\nDo not modify ServiceAccounts, Roles or RoleBindings. The new Pod's logs must list Pods without a `Forbidden` error.",
+      "concepts": [
+        "service accounts",
+        "rbac",
+        "roles",
+        "troubleshooting"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Deployment inspector uses serviceAccountName pod-reader",
+          "verificationScriptFile": "q9_s1_validate_sa.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "2",
+          "description": "Roles and RoleBindings are unchanged (read-pods: get,list; read-pod-logs: get; bindings intact)",
+          "verificationScriptFile": "q9_s2_validate_rbac.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "3",
+          "description": "New Pod logs list Pods with no Forbidden error",
+          "verificationScriptFile": "q9_s3_validate_logs.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        }
+      ]
+    },
+    {
+      "id": "10",
+      "namespace": "ckad-ingress-fix",
+      "machineHostname": "ckad9999",
+      "question": "Ingress, Service and Deployment `catalog` exist in namespace `ckad-ingress-fix`, but `http://catalog.ckad.local/` is inaccessible. Inspect the path from Ingress to Service to Pod and fix the incorrect configuration (there is more than one mistake):\n\n1. Service `catalog` must select the Pods of Deployment `catalog` (it currently has no endpoints).\n2. The Ingress rule must route to the correct backend Service.\n\nPreserve the working resources - change only what is wrong.",
+      "concepts": [
+        "services",
+        "endpoints",
+        "ingress",
+        "troubleshooting"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Service catalog selector matches the Pod labels (app=catalog)",
+          "verificationScriptFile": "q10_s1_validate_selector.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "2",
+          "description": "Service catalog has at least one ready endpoint",
+          "verificationScriptFile": "q10_s2_validate_endpoints.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "3",
+          "description": "Ingress catalog routes to backend service catalog (not catalogtest)",
+          "verificationScriptFile": "q10_s3_validate_ingress.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        }
+      ]
+    }
+  ]
+}
