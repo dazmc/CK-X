@@ -1,0 +1,366 @@
+{
+  "questions": [
+    {
+      "id": "1",
+      "namespace": "rbac-test",
+      "machineHostname": "ckad9999",
+      "question": "In namespace `rbac-test`:\n\n1. Create a Role named `pod-manager` that allows `get`, `list`, `watch`, `create` and `delete` on `pods` (and nothing else).\n2. Bind this Role to user `alice` with a RoleBinding named `pod-manager-binding`.\n3. Verify with `kubectl auth can-i ... --as=alice`: alice must be able to manage pods inside `rbac-test` only - she must NOT be able to read secrets anywhere, nor touch pods in other namespaces.",
+      "concepts": [
+        "rbac",
+        "roles",
+        "rolebindings",
+        "impersonation",
+        "can-i"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Role pod-manager grants exactly get,list,watch,create,delete on pods",
+          "verificationScriptFile": "q1_s1_validate_role.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "RoleBinding pod-manager-binding binds Role pod-manager to user alice",
+          "verificationScriptFile": "q1_s2_validate_binding.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "3",
+          "description": "can-i as alice: manage pods in rbac-test only - secrets and other namespaces denied",
+          "verificationScriptFile": "q1_s3_validate_cani.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "namespace": "sa-token",
+      "machineHostname": "ckad9999",
+      "question": "In namespace `sa-token`:\n\n1. Create a ServiceAccount named `app-sa`.\n2. Create a Pod named `sa-pod` (image `nginx:1.27`) that runs under this ServiceAccount.\n3. The pod must be Running, and the ServiceAccount token must be mounted at the standard path `/var/run/secrets/kubernetes.io/serviceaccount/` - verify the mounted token really belongs to `app-sa`.",
+      "concepts": [
+        "serviceaccounts",
+        "service account tokens",
+        "pod security",
+        "automount"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "ServiceAccount app-sa exists and pod sa-pod uses it (serviceAccountName)",
+          "verificationScriptFile": "q2_s1_validate_sa_pod.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "2",
+          "description": "Pod sa-pod is Running with image nginx:1.27",
+          "verificationScriptFile": "q2_s2_validate_running.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "3",
+          "description": "Service account token is mounted in the pod and its subject is app-sa",
+          "verificationScriptFile": "q2_s3_validate_token.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "namespace": "kustomize-demo",
+      "machineHostname": "ckad9999",
+      "question": "A Kustomize base lives at `/tmp/exam/kustomize/base` on `ckad9999` - it defines a Deployment and a Service and sets the target namespace.\n\n1. Apply the KUSTOMIZATION (not the raw YAML files) so that ALL resources it defines are created in namespace `kustomize-demo`.\n2. The Deployment must end up with 2 replicas of `nginx:1.27`, and the Service must select the Deployment's pods on port 80.\n3. No copies of these resources may be left in the `default` namespace.",
+      "concepts": [
+        "kustomize",
+        "kustomization",
+        "kubectl apply -k",
+        "configuration as code"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Deployment webapp and Service webapp exist in kustomize-demo, nothing stray in default",
+          "verificationScriptFile": "q3_s1_validate_resources.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "2",
+          "description": "Deployment webapp has 2 replicas of nginx:1.27",
+          "verificationScriptFile": "q3_s2_validate_deploy.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "3",
+          "description": "Service webapp selects the Deployment pods and exposes port 80",
+          "verificationScriptFile": "q3_s3_validate_service.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "namespace": "init-shared",
+      "machineHostname": "ckad9999",
+      "question": "In namespace `init-shared` create a Pod named `init-pod`:\n\n1. An **init container** named `init-container` (image `busybox:1.36`) running `sh -c 'echo \"Init complete\" > /shared/init.txt'`, writing into an emptyDir volume named `shared-vol` mounted at `/shared`.\n2. A main container named `main-container` (image `nginx:1.27`) that mounts the SAME volume `shared-vol` at `/usr/share/data`.\n3. The init container must finish (exit 0) before the main container starts, and `/usr/share/data/init.txt` inside the running pod must contain `Init complete`.",
+      "concepts": [
+        "init containers",
+        "emptydir",
+        "volumes",
+        "volume mounts",
+        "pod lifecycle"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Init container init-container (busybox:1.36) runs the echo command as defined",
+          "verificationScriptFile": "q4_s1_validate_init.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "emptyDir shared-vol mounted at /shared by init and /usr/share/data by main container",
+          "verificationScriptFile": "q4_s2_validate_volumes.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "3",
+          "description": "Init container completed, pod Running, and /usr/share/data/init.txt says 'Init complete'",
+          "verificationScriptFile": "q4_s3_validate_file.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "namespace": "env-demo",
+      "machineHostname": "ckad9999",
+      "question": "In namespace `env-demo`:\n\n1. Create a ConfigMap named `app-config` with keys `APP_ENV=production` and `LOG_LEVEL=info`.\n2. Create a Secret named `db-secret` with key `DB_PASSWORD=supersecret`.\n3. Create a Pod named `config-pod` (image `nginx:1.27`, container named `config-pod`) that exposes BOTH in the main container's environment: all keys of `app-config` via `envFrom`, and `DB_PASSWORD` via a single `env` entry sourced from the Secret.\n4. The pod must be Running with all three values visible in its environment.",
+      "concepts": [
+        "configmaps",
+        "secrets",
+        "environment variables",
+        "envfrom",
+        "secretkeyref"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "ConfigMap app-config has APP_ENV=production and LOG_LEVEL=info",
+          "verificationScriptFile": "q5_s1_validate_cm.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "2",
+          "description": "Secret db-secret has DB_PASSWORD=supersecret",
+          "verificationScriptFile": "q5_s2_validate_secret.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        },
+        {
+          "id": "3",
+          "description": "Pod config-pod uses envFrom for app-config and env/secretKeyRef for DB_PASSWORD",
+          "verificationScriptFile": "q5_s3_validate_refs.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "4",
+          "description": "Pod Running and APP_ENV, LOG_LEVEL, DB_PASSWORD visible in the container env",
+          "verificationScriptFile": "q5_s4_validate_values.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        }
+      ]
+    },
+    {
+      "id": "6",
+      "namespace": "dynamic-storage",
+      "machineHostname": "ckad9999",
+      "question": "In namespace `dynamic-storage`:\n\n1. Create a PersistentVolumeClaim named `dynamic-pvc` requesting `1Gi` with `ReadWriteOnce` that uses the cluster's **default StorageClass** (find it with `kubectl get storageclass` - the one marked `(default)`).\n2. Create a Pod named `storage-pod` (image `nginx:1.27`) mounting the claim at `/data`.\n3. The claim must end up `Bound` to a dynamically provisioned volume, and the pod must be Running with the volume mounted at `/data`.",
+      "concepts": [
+        "storageclasses",
+        "persistentvolumeclaims",
+        "dynamic provisioning",
+        "volumes"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "PVC dynamic-pvc: 1Gi ReadWriteOnce on the cluster's default StorageClass",
+          "verificationScriptFile": "q6_s1_validate_pvc.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "2",
+          "description": "PVC Bound to a dynamically provisioned volume from that StorageClass",
+          "verificationScriptFile": "q6_s2_validate_bound.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "3",
+          "description": "Pod storage-pod Running with dynamic-pvc mounted at /data",
+          "verificationScriptFile": "q6_s3_validate_pod.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        }
+      ]
+    },
+    {
+      "id": "7",
+      "namespace": "secure",
+      "machineHostname": "ckad9999",
+      "question": "In namespace `secure` create a NetworkPolicy named `deny-all` that blocks ALL traffic to and from every pod in the namespace:\n\n1. It must select ALL pods (`podSelector: {}`).\n2. It must cover BOTH directions - Ingress and Egress.\n3. It must define no allow rules at all: with this policy in place nothing in `secure` can receive or initiate traffic.",
+      "concepts": [
+        "networkpolicies",
+        "default deny",
+        "policytypes",
+        "ingress",
+        "egress"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "NetworkPolicy deny-all exists in secure with podSelector {} (all pods)",
+          "verificationScriptFile": "q7_s1_validate_selector.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "policyTypes includes both Ingress and Egress",
+          "verificationScriptFile": "q7_s2_validate_types.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "3",
+          "description": "No ingress and no egress allow rules are defined",
+          "verificationScriptFile": "q7_s3_validate_norules.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        }
+      ]
+    },
+    {
+      "id": "8",
+      "namespace": "image-pull",
+      "machineHostname": "ckad9999",
+      "question": "Pod `bad-image` in namespace `image-pull` never starts: it was created with a wrong image reference and is stuck failing to pull it.\n\n1. The intended image is `nginx:1.27` - fix the pod so it pulls and runs.\n2. Keep the pod named `bad-image` in namespace `image-pull`; it must end up Running and Ready.",
+      "concepts": [
+        "imagepullbackoff",
+        "errimagepull",
+        "troubleshooting",
+        "pod spec"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Pod bad-image now uses image nginx:1.27",
+          "verificationScriptFile": "q8_s1_validate_image.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "2",
+          "description": "Pod bad-image is Running and Ready",
+          "verificationScriptFile": "q8_s2_validate_ready.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "3",
+          "description": "Pod still has a single container named bad-image",
+          "verificationScriptFile": "q8_s3_validate_container.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        }
+      ]
+    },
+    {
+      "id": "9",
+      "namespace": "pending-lab",
+      "machineHostname": "ckad9999",
+      "question": "Pod `pending-pod` in namespace `pending-lab` has been stuck `Pending` since it was created.\n\n1. Diagnose it: its `nodeSelector` requires the label `workload=batch`, and no node carries that label yet.\n2. The ops team wants this pod to run on node `k3d-cluster-agent-1` - make it schedulable there by labelling the node.\n3. Do NOT delete, recreate or edit the pod - its identity must not change. Fix it at the node.",
+      "concepts": [
+        "troubleshooting",
+        "pending pods",
+        "node labels",
+        "node selector",
+        "scheduling"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "Node k3d-cluster-agent-1 carries the label workload=batch",
+          "verificationScriptFile": "q9_s1_validate_label.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "Pod pending-pod is Running on k3d-cluster-agent-1",
+          "verificationScriptFile": "q9_s2_validate_running.sh",
+          "expectedOutput": "0",
+          "weightage": 4
+        },
+        {
+          "id": "3",
+          "description": "Pod identity preserved (same UID as recorded at setup - pod was not recreated)",
+          "verificationScriptFile": "q9_s3_validate_uid.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        }
+      ]
+    },
+    {
+      "id": "10",
+      "namespace": "logs",
+      "machineHostname": "ckad9999",
+      "question": "Pod `multi-app` in namespace `logs` has two containers: `app` (which produces numbered log lines) and `sidecar` (which emits unrelated noise).\n\n1. Save the **last 100 lines** of the `app` container's logs - only that container's logs - to `/tmp/exam/outputs/multi-app-logs.txt` on `ckad9999` (create the directory if needed).\n2. The file must contain exactly those 100 lines in order, and nothing from the sidecar container.",
+      "concepts": [
+        "kubectl logs",
+        "multi-container pods",
+        "log aggregation",
+        "container selection"
+      ],
+      "verification": [
+        {
+          "id": "1",
+          "description": "File exists with exactly 100 lines",
+          "verificationScriptFile": "q10_s1_validate_lines.sh",
+          "expectedOutput": "0",
+          "weightage": 3
+        },
+        {
+          "id": "2",
+          "description": "Content is app-line-51 through app-line-150 in order (the last 100 lines)",
+          "verificationScriptFile": "q10_s2_validate_content.sh",
+          "expectedOutput": "0",
+          "weightage": 5
+        },
+        {
+          "id": "3",
+          "description": "File contains no sidecar container output",
+          "verificationScriptFile": "q10_s3_validate_nosidecar.sh",
+          "expectedOutput": "0",
+          "weightage": 2
+        }
+      ]
+    }
+  ]
+}

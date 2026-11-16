@@ -151,6 +151,16 @@
       "examDurationInMinutes": 90
     },
     {
+      "id": "cka-008",
+      "assetPath": "assets/exams/cka/008",
+      "name": "CKA Practice Lab - techiescamp Guide",
+      "category": "CKA",
+      "description": "10-question lab adapted from the practice questions in techiescamp/cka-certification-guide (credited to Techiescamp; note: that repo is All Rights Reserved, not MIT - see answers.md): RBAC Role bound to a user with can-i scoping, ServiceAccount token verification, applying a Kustomize base, init containers sharing an emptyDir, ConfigMap/Secret environment variables, PVC on the default StorageClass, default-deny NetworkPolicy, pod ImagePullBackOff repair, Pending-pod node-label diagnosis, and multi-container log extraction.",
+      "warmUpTimeInSeconds": 260,
+      "difficulty": "Hard",
+      "examDurationInMinutes": 90
+    },
+    {
       "id": "cka-001",
       "assetPath": "assets/exams/cka/001",
       "name": "CKA Practice Lab - Core Concepts",
